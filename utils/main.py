@@ -9,6 +9,7 @@ import logging
 from .systray import Systray
 import threading, asyncio
 import ctypes
+import .utils
 
 clientClose = False
 Presence = True
@@ -88,6 +89,16 @@ asyncio.set_event_loop(loop)
 
 files = None
 
+def stop(s):
+    try:
+        Presence = False
+        clientClose = True
+        s.visible = False
+        s.stop()
+        os._exit(1)
+    except:
+        Presence = False
+
 def main(file):
     global Presence
     global files
@@ -95,22 +106,16 @@ def main(file):
 
     files = file
     s = Systray()
-    x = threading.Thread(target=presence)
+    x = threading.Thread(target=presence, args=(s,))
     x.start()
     s.run()
-    stop = s.exit()
-    if stop == True:
-        try:
-            Presence = False
-            clientClose = True
-            s.visible = False
-            s.stop()
-            os._exit(1)
-        except:
-            Presence = False
+    Stop = s.exit()
+    if Stop == True:
+        stop(s)
+        
 
 
-def presence():
+def presence(s):
     asyncio.set_event_loop(asyncio.new_event_loop())
 
     client = valRPC()
@@ -137,13 +142,16 @@ def presence():
     user32.ShowWindow(hWnd, 0)
     print()
     print("Hiding Window! Have fun playing!!")
-    presenceLoop(client, rpc, pid)
+    presenceLoop(client, rpc, pid, s)
 
 
-def presenceLoop(client, rpc, pid):
+def presenceLoop(client, rpc, pid, s):
     global Presence
     global clientClose
     
+    if utils.Processes.are_processes_running() == False:
+        stop(s)
+
     if Presence == False:
         rpc.start()
 

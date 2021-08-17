@@ -1,97 +1,472 @@
-import os
-import json
-import psutil
 import valclient
+from .utils import valRPC
+from .rpc import RPC
 from .config.config import Config
 import time
+import os
+import iso8601
 import logging
+from .systray import Systray
+import threading, asyncio
+import ctypes
+import .utils
 
-class Processes:
+clientClose = False
+Presence = True
+kernel32 = ctypes.WinDLL('kernel32')
+user32 = ctypes.WinDLL('user32')
+hWnd = kernel32.GetConsoleWindow()
+maps = {
+    "Range":"The Range",
+    "Ascent":"Ascent",
+    "Bonsai":"Split",
+    "Duality":"Bind",
+    "Foxtrot":"Breeze",
+    "Port":"Icebox",
+    "Triad":"Haven",
+}
 
-    @staticmethod
-    def are_processes_running(required_processes=["VALORANT-Win64-Shipping.exe", "RiotClientServices.exe"]):
-        processes = []
-        for proc in psutil.process_iter():
-            processes.append(proc.name())
+queue = {
+    "newmap": "New Map",
+    "competitive": "Competitive",
+    "unrated": "Unrated",
+    "spikerush": "Spike Rush",
+    "deathmatch": "Deathmatch",
+    "ggteam": "Escalation",
+    "onefa": "Replication",
+    "custom": "Custom",
+    "snowball": "Snowball Fight",
+    "": "Custom",
+}
+
+agents = {
+    "5F8D3A7F-467B-97F3-062C-13ACF203C006": "agent_breach",
+    "F94C3B30-42BE-E959-889C-5AA313DBA261": "agent_raze",
+    "601DBBE7-43CE-BE57-2A40-4ABD24953621": "agent_kay/o",
+    "6F2A04CA-43E0-BE17-7F36-B3908627744D": "agent_skye",
+    "117ED9E3-49F3-6512-3CCF-0CADA7E3823B": "agent_cypher",
+    "DED3520F-4264-BFED-162D-B080E2ABCCF9": "agent_sova",
+    "320B2A48-4D9B-A075-30F1-1F93A9B638FA": "agent_sova",
+    "1E58DE9C-4950-5125-93E9-A0AEE9F98746": "agent_killjoy",
+    "707EAB51-4836-F488-046A-CDA6BF494859": "agent_viper",
+    "EB93336A-449B-9C1B-0A54-A891F7921D69": "agent_phoenix",
+    "41FB69C1-4189-7B37-F117-BCAF1E96F1BF": "agent_astra",
+    "9F0D8BA9-4140-B941-57D3-A7AD57C6B417": "agent_brimstone",
+    "7F94D92C-4234-0A36-9646-3A87EB8B5C89": "agent_yoru",
+    "569FDD95-4D10-43AB-CA70-79BECC718B46": "agent_sage",
+    "A3BFB853-43B2-7238-A4F1-AD90E9E46BCC": "agent_reyna",
+    "8E253930-4C05-31DD-1B6C-968525494517": "agent_omen",
+    "ADD6443A-41BD-E414-F6AD-E58D267F4E95": "agent_jett",
+    "36FB82AF-409D-C0ED-4B49-57B1EB08FBD5": "Unknown",
+}
+
+rankName = {
+    "rank_3": "Iron 1",
+    "rank_4": "Iron 2",
+    "rank_5": "Iron 3",
+    "rank_6": "Bronze 1",
+    "rank_7": "Bronze 2",
+    "rank_8": "Bronze 3",
+    "rank_9": "Silver 1",
+    "rank_10": "Silver 2",
+    "rank_11": "Silver 3",
+    "rank_12": "Gold 1",
+    "rank_13": "Gold 2",
+    "rank_14": "Gold 3",
+    "rank_15": "Platinum 1",
+    "rank_16": "Platinum 2",
+    "rank_17": "Platinum 3",
+    "rank_18": "Diamond 1",
+    "rank_19": "Diamond 2",
+    "rank_20": "Diamond 3",
+    "rank_21": "Immortal",
+    "rank_22": "Immortal",
+    "rank_23":  "Immortal",
+    "rank_24":  "Radiant",
+}
+loop = asyncio.new_event_loop()
+asyncio.set_event_loop(loop)
+
+files = None
+
+def stop(s):
+    try:
+        Presence = False
+        clientClose = True
+        s.visible = False
+        s.stop()
+        os._exit(1)
+    except:
+        Presence = False
+
+def main(file):
+    global Presence
+    global files
+    global clientClose
+
+    files = file
+    s = Systray()
+    x = threading.Thread(target=presence, args=(s,))
+    x.start()
+    s.run()
+    Stop = s.exit()
+    if Stop == True:
+        stop(s)
         
-        return set(required_processes).issubset(processes)
-
-class valRPC:
-
-    def __init__(self):
-        self.conf = Config
-        self.config = self.conf.fetchConfig()
-        self.activated = False
-        self.puuid = None
-        self.region = self.config["regions"][0]
-        if self.region == "":
-            self.region = "na"
-        self.client = valclient.Client(region=self.region)
-        
-
-    def getClient(self):
-        return self.client
-
-    def start_game(self):
-        path = self.get_rcs_path()
-        launch_timeout = self.config["startup"]["launch_timeout"]
-        launch_timer = 0
-        
-        if not Processes.are_processes_running():
-            psutil.subprocess.Popen([path, "--launch-product=valorant", "--launch-patchline=live"])
-        while not Processes.are_processes_running():
-            print(f"[...] Waiting for VALORANT ({launch_timer})", end="\r")
-            launch_timer += 1
-            if launch_timer >= launch_timeout:
-                exit()
-            time.sleep(1)
-        print("[√] Valorant detected and running!")
-        self.client.activate()
 
 
-    def get_rcs_path(self):
-        riot_installs_path = os.path.expandvars("%PROGRAMDATA%\\Riot Games\\RiotClientInstalls.json")
-        try:
-            with open(riot_installs_path, "r") as file:
-                client_installs = json.load(file)
-                rcs_path = os.path.abspath(client_installs["rc_default"])
-                if not os.access(rcs_path, os.X_OK):
-                    return None
-                return rcs_path
-        except FileNotFoundError:
-            return None
+def presence(s):
+    asyncio.set_event_loop(asyncio.new_event_loop())
 
-    def startup(self):
-        sessions = self.client.riotclient_session_fetch_sessions()
-        for _, session in sessions.items():
-            if session["productId"] == "valorant":
-                launch_args = session["launchConfiguration"]["arguments"]
-                for arg in launch_args:
-                    if "-ares-deployment" in arg:
-                        region = arg.replace("-ares-deployment=","")
-                        data = self.config
-                        data["regions"][0] = region
-                        _ = self.conf.updateConf(data)
-                        return
+    client = valRPC()
+    rpc = RPC()
+    rpc.start()
+    pid = os.getpid()
+    datas = {
+        "pid":pid,
+        "state":"Loading...",
+        "large_image":"game_icon",
+        "small_image":"github_icon",
+        "large_text":"keivsc/ValorantRPC",
+        "small_text":"https://github.com/keivsc",
+        "buttons":[{"label":"View on GitHub", "url":"https://github.com/keivsc/ValorantRPC"}]
+    }
+    rpc.update(datas)
+    client.start_game()
+    client.startup()
+    time.sleep(2)
+    client = valRPC()
+    for x in range(5, -1, -1):
+        print(f"[...] RPC Started! Hiding window in ({x})", end="\r")
+        time.sleep(1)
+    user32.ShowWindow(hWnd, 0)
+    print()
+    print("Hiding Window! Have fun playing!!")
+    presenceLoop(client, rpc, pid, s)
 
-    def fetch_presence(self):
-        if self.activated == False:
-            self.client.activate()
-            self.activated = True
-            self.puuid = self.client.puuid
-        return self.client.fetch_presence()
 
-    def getPartyInv(self):
-        data = []
-        config = self.conf.fetchConfig()
-        presenceData = self.client.fetch_presence()
-        base_api_url = "https://colinhartigan.github.io/valorant-rpc?redir={0}&type={1}"
-        base_api_url = f"{base_api_url}&region={self.client.region}&playername={self.client.player_name}&playertag={self.client.player_tag}" # add on static values (region/playername)
-        if int(presenceData["partySize"]) < int(presenceData["maxPartySize"]):
-            if presenceData["partyAccessibility"] == "OPEN" and config["presence"]["show_join_button_with_open_party"]:
-                logging.debug(f"join link: "+ f"https://colinhartigan.github.io/valorant-rpc?redir=/valorant/join/{presenceData['partyId']}")
-                return [{"label":"Join","url":f"https://colinhartigan.github.io/valorant-rpc?redir=/valorant/join/{presenceData['partyId']}&type=join"}]
+def presenceLoop(client, rpc, pid, s):
+    global Presence
+    global clientClose
+    
+    if utils.Processes.are_processes_running() == False:
+        stop(s)
+
+    if Presence == False:
+        rpc.start()
+
+    pastPresence = None
+    matchmaking = False
+    matchTimer = None
+    matchFinished = True
+    showRank = False
+    matchAgent = None
+    while Presence == True:
+        config = Config.fetchConfig()
+        data = {
+            "pid":pid,
+        }
+        presenceData = client.fetch_presence()
+        if presenceData == None:
+            datas = {
+                "pid":pid,
+                "state":"Loading...",
+                "large_image":"game_icon",
+                "small_image":"github_icon",
+                "large_text":"keivsc/ValorantRPC",
+                "small_text":"https://github.com/keivsc",
+                "buttons":[{"label":"View on GitHub", "url":"https://github.com/keivsc/ValorantRPC"}]
+            }
+            rpc.update(datas)
+            time.sleep(config["presenceRefreshRate"])
+            continue
+        queueId = presenceData["queueId"]
+        userState = presenceData["sessionLoopState"]
+        partySize = presenceData["partySize"]
+
+        state = None
+        if matchFinished == True:
+            largeText = "ValorantRPC"
+            largeImage = "game_icon"
+        smallImage = None
+        smallText = None
+
+        if matchAgent != None and userState != "INGAME":
+            matchAgent = None
+
+        if partySize == 1:
+            state = "Solo"
+
+        elif partySize > 1:
+            state = f"In a party | {partySize} of {presenceData['maxPartySize']}"
+            if presenceData["isPartyOwner"] == True:
+                smallImage = "partyOwner"
+                smallText = "Party Owner"
+
+        if presenceData["partyAccessibility"] == "OPEN" and partySize < presenceData['maxPartySize']:
+            state+=" | Open Party"
             
-            if presenceData["partyAccessibility"] == "CLOSED" and config["presence"]["allow_join_requests"]:
-                return [{"label":"Request to Join","url":f"https://colinhartigan.github.io/valorant-rpc?redir=/valorant/request/{presenceData['partyId']}/{self.client.puuid}&type=request"}]
+
+        if presenceData['partyState'] == "CUSTOM_GAME_SETUP":
+            if matchFinished == False:
+                matchFinished == True
+            matchmaking = True
+            if matchTimer == None:
+                matchTimer = time.time()
+            dots = ""
+            details = f"Setting Up a Custom Game{dots}"
+            mapAsset = presenceData["matchMap"].rsplit("/", 1)[1]
+            Map = maps[mapAsset]
+            largeImage = "splash_"+Map.lower()+"_square"
+            largeText = Map
+            dots+"."
+            if len(dots) >= 3:
+                dots = ""
+
+        elif presenceData['partyState'] != "MATCHMAKING" and matchmaking == True:
+            matchmaking = False
+
+        elif presenceData['partyState'] == "MATCHMAKING" and matchmaking == False:
+            if matchFinished == False:
+                matchFinished == True
+            matchmaking = True
+            data["start"] = Utilities.iso8601_to_epoch(presenceData['queueEntryTime'])
+            dots = ""
+            state = f"In Queue | {queue[queueId]}{dots}"
+            dots+"."
+            if len(dots) >= 3:
+                dots = ""
+
+
+        elif userState == "MENUS":
+            if matchFinished == False:
+                Presence = False
+                matchFinished == True
+            matchTimer = None
+            details = f"Lobby - {queue[queueId]}"
+            if presenceData["isIdle"] == True:
+                state = "Away"
+                smallImage = "away"
+
+        elif userState == "PREGAME":
+            data["end"] = (presenceData['PhaseTimeRemainingNS'] // 1000000000) + time.time()
+            details = f"Pregame - {queue[queueId]}"
+            mapAsset = presenceData["matchMap"].rsplit("/", 1)[1]
+            Map = maps[mapAsset]
+            largeImage = "splash_"+Map.lower()+"_square"
+            largeText = Map
+            smallImage = getSmallImage(client.getClient(), userState)
+            try:
+                smallText = smallImage.split("_")[1].capitalize()
+            except:
+                smallText = smallImage
+            
+
+        elif userState == "INGAME":
+            matchTimer = time.time()
+
+            data["start"] = matchTimer
+
+    
+            if presenceData["matchMap"] == "/Game/Maps/Poveglia/Range":
+                largeImage = "splash_range_square"
+                details = "The Range"
+                largeText = "Range"
+            
+            else:
+                details = queue[queueId]
+                state = f"{presenceData['partyOwnerMatchScoreAllyTeam']} : {presenceData['partyOwnerMatchScoreEnemyTeam']}"
+                if config["presence"]["show_rank"] == True:
+                    mapAsset = presenceData["matchMap"].rsplit("/", 1)[1]
+                    Map = maps[mapAsset]
+                    largeImage = "splash_"+Map.lower()+"_square"
+                    if showRank == True:
+                        rankID = "rank_"+str(presenceData["competitiveTier"])
+                        smallImage = rankID
+                        rank = rankName[rankID]
+                        if rank == "Radiant" or rank == "Immortal":
+                            leadPos = presenceData["leaderboardPosition"]
+                            rank = f"Immortal #{leadPos}"
+                            if leadPos >= 500:
+                                rank = f"Radiant #{leadPos}"
+                        mmr = client.client.fetch_mmr()["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][Loader.load_all_content(client.client)["season"]["season_uuid"]]
+                        smallText = rank + f" ~ {mmr['RankedRating']}RR"
+                        showRank = False
+                    else:
+
+                        matchAgent = getSmallImage(client.getClient(), userState)
+                        smallText = matchAgent.split("_")[1].capitalize()
+                        smallImage = matchAgent
+                        showRank = True
+                elif matchFinished == True:
+                    
+                    mapAsset = presenceData["matchMap"].rsplit("/", 1)[1]
+                    Map = maps[mapAsset]
+                    largeImage = "splash_"+Map.lower()+"_square"
+                    matchAgent = getSmallImage(client.getClient(), userState)
+                    largeText = Map
+                    matchFinished = False
+                    smallText = matchAgent.split("_")[1].capitalize()
+                    smallImage = matchAgent
+
+                
+        else:
+            time.sleep(config["presenceRefreshRate"])
+            continue
+
+
+        if state != None:
+            data["state"] = state
+        data["details"] = details
+        data["large_image"] = largeImage
+        data["large_text"] = largeText
+
+        if smallImage != None:
+            data["small_image"] = smallImage
+        if smallText != None:
+            data["small_text"] = smallText
+        if matchTimer != None:
+            data["start"] = matchTimer
+
+        if smallImage == None and smallText == None:
+            if config["presence"]["show_rank"] == True:
+                rankID = "rank_"+str(presenceData["competitiveTier"])
+                smallImage = rankID
+                rank = rankName[rankID]
+                if rank == "Radiant" or rank == "Immortal":
+                    leadPos = presenceData["leaderboardPosition"]
+                    rank = f"Immortal #{leadPos}"
+                    if leadPos >= 500:
+                        rank = f"Radiant #{leadPos}"
+                mmr = client.client.fetch_mmr()["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][Loader.load_all_content(client.client)["season"]["season_uuid"]]
+                smallText = rank + f" ~ {mmr['RankedRating']}RR"
+                data["small_image"] = smallImage
+                data["small_text"] = smallText
+
+        if data != pastPresence and Presence == True:
+            rpc.update(data)
+            pastPresence = data
+        time.sleep(config["presenceRefreshRate"])
+        if data != pastPresence and Presence == True:
+            rpc.clear(pid)
+
+
+def getSmallImage(client:valclient.Client, userState):
+    if userState == "PREGAME":
+        user = client.pregame_fetch_player()
+        match = client.pregame_fetch_match(user["MatchID"])
+        for player in match["Players"]:
+            if player["Subject"] == user["Subject"]:
+                return agents[player["CharacterID"].upper()]
+    if userState == "INGAME":
+        user = client.coregame_fetch_player()
+        match = client.coregame_fetch_match(user["MatchID"])
+        for player in match["Players"]:
+            if player["Subject"] == user["Subject"]:
+                return agents[player["CharacterID"].upper()]
+    
+
+
+class Utilities:
+
+    @staticmethod 
+    def iso8601_to_epoch(time):
+        if time == "0001.01.01-00.00.00":
+            return None
+        split = time.split("-")
+        split[0] = split[0].replace(".","-")
+        split[1] = split[1].replace(".",":")
+        split = "T".join(i for i in split)
+        split = iso8601.parse_date(split).timestamp() #converts iso8601 to epoch
+        return split
+
+import requests
+
+class Loader:
+
+    @staticmethod 
+    def fetch(endpoint="/"):
+        data = requests.get(f"https://valorant-api.com/v1{endpoint}")
+        return data.json()
+
+    @staticmethod 
+    def load_all_content(client):
+        content_data = {
+            "agents": [],
+            "maps": [],
+            "modes": [],   
+            "comp_tiers": [],
+            "season": {},
+            "queue_aliases": { #i'm so sad these have to be hardcoded but oh well :(
+                "newmap": "New Map",
+                "competitive": "Competitive",
+                "unrated": "Unrated",
+                "spikerush": "Spike Rush",
+                "deathmatch": "Deathmatch",
+                "ggteam": "Escalation",
+                "onefa": "Replication",
+                "custom": "Custom",
+                "snowball": "Snowball Fight",
+                "": "Custom",
+            },
+            "team_aliases": {
+                "TeamOne": "Defender",
+                "TeamTwo": "Attacker",
+                "TeamSpectate": "Observor",
+                "TeamOneCoaches": "Defender Coach",
+                "TeamTwoCoaches": "Attacker Coach",
+                "Red": ""
+            },
+            "team_image_aliases": {
+                "TeamOne": "team_defender",
+                "TeamTwo": "team_attacker",
+                "Red": "team_defender",
+                "Blue": "team_attacker",
+            },
+            "modes_with_icons": ["ggteam","onefa","snowball","spikerush","unrated","deathmatch"]
+        }
+        all_content = client.fetch_content()
+        agents = Loader.fetch("/agents")["data"]
+        maps = Loader.fetch("/maps")["data"]
+        modes = Loader.fetch("/gamemodes")["data"]
+        comp_tiers = Loader.fetch("/competitivetiers")["data"][-1]["tiers"]
         
+
+        for season in all_content["Seasons"]:
+            if season["IsActive"] and season["Type"] == "act":
+                for comp_season in all_content["CompetitiveSeasons"]:
+                    if comp_season["SeasonID"] == season["ID"]:
+                        content_data["season"] = {
+                            "competitive_uuid": comp_season["ID"],
+                            "season_uuid": season["ID"],
+                            "display_name": season["Name"]
+                        }
+        
+        for agent in agents:
+            content_data["agents"].append({
+                "uuid": agent["uuid"],
+                "display_name": agent["displayName"],
+                "internal_name": agent["developerName"]
+            })
+
+        for game_map in maps:
+            content_data["maps"].append({
+                "uuid": game_map["uuid"],
+                "display_name": game_map["displayName"],
+                "path": game_map["mapUrl"],
+                "internal_name": game_map["mapUrl"].split("/")[-1]
+            })
+
+        for mode in modes:
+            content_data["modes"].append({
+                "uuid": mode["uuid"],
+                "display_name": mode["displayName"],
+            })
+
+        for tier in comp_tiers:
+            content_data["comp_tiers"].append({
+                "display_name": tier["tierName"],
+                "id": tier["tier"],
+            })
+
+        return content_data
