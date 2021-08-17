@@ -1,0 +1,7 @@
+valclient
+pypresence
+pystray
+pyperclip
+plyer
+requests
+pillow
