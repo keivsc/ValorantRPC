@@ -40,7 +40,7 @@ class RPC():
     
     def clear(self, pid):
         self.client.clear(pid)
-        print("Cleared")
+
 
     def close(self):
         self.client.close()

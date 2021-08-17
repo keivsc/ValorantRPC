@@ -1,5 +1,5 @@
 import valclient
-from .utils import valRPC
+from .utils import valRPC, Processes
 from .rpc import RPC
 from .config.config import Config
 import time
@@ -9,7 +9,8 @@ import logging
 from .systray import Systray
 import threading, asyncio
 import ctypes
-import .utils
+import psutil
+
 
 clientClose = False
 Presence = True
@@ -42,7 +43,7 @@ queue = {
 agents = {
     "5F8D3A7F-467B-97F3-062C-13ACF203C006": "agent_breach",
     "F94C3B30-42BE-E959-889C-5AA313DBA261": "agent_raze",
-    "601DBBE7-43CE-BE57-2A40-4ABD24953621": "agent_kay/o",
+    "601DBBE7-43CE-BE57-2A40-4ABD24953621": "agent_kayo",
     "6F2A04CA-43E0-BE17-7F36-B3908627744D": "agent_skye",
     "117ED9E3-49F3-6512-3CCF-0CADA7E3823B": "agent_cypher",
     "DED3520F-4264-BFED-162D-B080E2ABCCF9": "agent_sova",
@@ -57,7 +58,8 @@ agents = {
     "A3BFB853-43B2-7238-A4F1-AD90E9E46BCC": "agent_reyna",
     "8E253930-4C05-31DD-1B6C-968525494517": "agent_omen",
     "ADD6443A-41BD-E414-F6AD-E58D267F4E95": "agent_jett",
-    "36FB82AF-409D-C0ED-4B49-57B1EB08FBD5": "Unknown",
+    "36FB82AF-409D-C0ED-4B49-57B1EB08FBD5": "unknown",
+    "":"unknown"
 }
 
 rankName = {
@@ -90,6 +92,9 @@ asyncio.set_event_loop(loop)
 files = None
 
 def stop(s):
+    global Presence
+    global clientClose
+
     try:
         Presence = False
         clientClose = True
@@ -104,6 +109,7 @@ def main(file):
     global files
     global clientClose
 
+    Config.checkConfig()
     files = file
     s = Systray()
     x = threading.Thread(target=presence, args=(s,))
@@ -122,6 +128,7 @@ def presence(s):
     rpc = RPC()
     rpc.start()
     pid = os.getpid()
+    rpc.clear(pid)
     datas = {
         "pid":pid,
         "state":"Loading...",
@@ -132,16 +139,19 @@ def presence(s):
         "buttons":[{"label":"View on GitHub", "url":"https://github.com/keivsc/ValorantRPC"}]
     }
     rpc.update(datas)
-    client.start_game()
+    x = client.start_game()
+    if x == False:
+        stop(s)
     client.startup()
     time.sleep(2)
     client = valRPC()
     for x in range(5, -1, -1):
         print(f"[...] RPC Started! Hiding window in ({x})", end="\r")
         time.sleep(1)
-    user32.ShowWindow(hWnd, 0)
     print()
     print("Hiding Window! Have fun playing!!")
+    time.sleep(.5)
+    user32.ShowWindow(hWnd, 0)
     presenceLoop(client, rpc, pid, s)
 
 
@@ -149,8 +159,7 @@ def presenceLoop(client, rpc, pid, s):
     global Presence
     global clientClose
     
-    if utils.Processes.are_processes_running() == False:
-        stop(s)
+
 
     if Presence == False:
         rpc.start()
@@ -161,12 +170,17 @@ def presenceLoop(client, rpc, pid, s):
     matchFinished = True
     showRank = False
     matchAgent = None
-    while Presence == True:
+    appOn = True
+    while appOn:
+
         config = Config.fetchConfig()
         data = {
             "pid":pid,
         }
-        presenceData = client.fetch_presence()
+        try:
+            presenceData = client.fetch_presence()
+        except:
+            stop(s)
         if presenceData == None:
             datas = {
                 "pid":pid,
@@ -185,8 +199,9 @@ def presenceLoop(client, rpc, pid, s):
         partySize = presenceData["partySize"]
 
         state = None
+        largeText=None
+        largeImage=None
         if matchFinished == True:
-            largeText = "ValorantRPC"
             largeImage = "game_icon"
         smallImage = None
         smallText = None
@@ -197,7 +212,10 @@ def presenceLoop(client, rpc, pid, s):
         if partySize == 1:
             state = "Solo"
 
-        elif partySize > 1:
+        elif partySize == 2:
+            state = "Duo"
+
+        elif partySize > 2:
             state = f"In a party | {partySize} of {presenceData['maxPartySize']}"
             if presenceData["isPartyOwner"] == True:
                 smallImage = "partyOwner"
@@ -207,23 +225,8 @@ def presenceLoop(client, rpc, pid, s):
             state+=" | Open Party"
             
 
-        if presenceData['partyState'] == "CUSTOM_GAME_SETUP":
-            if matchFinished == False:
-                matchFinished == True
-            matchmaking = True
-            if matchTimer == None:
-                matchTimer = time.time()
-            dots = ""
-            details = f"Setting Up a Custom Game{dots}"
-            mapAsset = presenceData["matchMap"].rsplit("/", 1)[1]
-            Map = maps[mapAsset]
-            largeImage = "splash_"+Map.lower()+"_square"
-            largeText = Map
-            dots+"."
-            if len(dots) >= 3:
-                dots = ""
 
-        elif presenceData['partyState'] != "MATCHMAKING" and matchmaking == True:
+        if presenceData['partyState'] != "MATCHMAKING" and matchmaking == True:
             matchmaking = False
 
         elif presenceData['partyState'] == "MATCHMAKING" and matchmaking == False:
@@ -237,19 +240,9 @@ def presenceLoop(client, rpc, pid, s):
             if len(dots) >= 3:
                 dots = ""
 
-
-        elif userState == "MENUS":
-            if matchFinished == False:
-                Presence = False
-                matchFinished == True
-            matchTimer = None
-            details = f"Lobby - {queue[queueId]}"
-            if presenceData["isIdle"] == True:
-                state = "Away"
-                smallImage = "away"
-
         elif userState == "PREGAME":
-            data["end"] = (presenceData['PhaseTimeRemainingNS'] // 1000000000) + time.time()
+            user = client.client.pregame_fetch_player()
+            data["end"] = (client.client.pregame_fetch_match(user["MatchID"])['PhaseTimeRemainingNS'] // 1000000000) + time.time()
             details = f"Pregame - {queue[queueId]}"
             mapAsset = presenceData["matchMap"].rsplit("/", 1)[1]
             Map = maps[mapAsset]
@@ -259,11 +252,12 @@ def presenceLoop(client, rpc, pid, s):
             try:
                 smallText = smallImage.split("_")[1].capitalize()
             except:
-                smallText = smallImage
+                smallText = smallImage.capitalize()
             
 
         elif userState == "INGAME":
-            matchTimer = time.time()
+            if matchTimer == None:
+                matchTimer = time.time()
 
             data["start"] = matchTimer
 
@@ -274,12 +268,19 @@ def presenceLoop(client, rpc, pid, s):
                 largeText = "Range"
             
             else:
-                details = queue[queueId]
-                state = f"{presenceData['partyOwnerMatchScoreAllyTeam']} : {presenceData['partyOwnerMatchScoreEnemyTeam']}"
+                details = f"{queue[queueId]} | {presenceData['partyOwnerMatchScoreAllyTeam']} : {presenceData['partyOwnerMatchScoreEnemyTeam']}"
+                mapAsset = presenceData["matchMap"].rsplit("/", 1)[1]
+                Map = maps[mapAsset]
+                largeImage = "splash_"+Map.lower()+"_square"
+                matchAgent = getSmallImage(client.getClient(), userState)
+                largeText = Map
+                matchFinished = False
+                try:
+                    smallText = matchAgent.split("_")[1].capitalize()
+                except:
+                    smallText = matchAgent.capitalize()
+
                 if config["presence"]["show_rank"] == True:
-                    mapAsset = presenceData["matchMap"].rsplit("/", 1)[1]
-                    Map = maps[mapAsset]
-                    largeImage = "splash_"+Map.lower()+"_square"
                     if showRank == True:
                         rankID = "rank_"+str(presenceData["competitiveTier"])
                         smallImage = rankID
@@ -290,26 +291,37 @@ def presenceLoop(client, rpc, pid, s):
                             if leadPos >= 500:
                                 rank = f"Radiant #{leadPos}"
                         mmr = client.client.fetch_mmr()["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][Loader.load_all_content(client.client)["season"]["season_uuid"]]
-                        smallText = rank + f" ~ {mmr['RankedRating']}RR"
+                        smallText = rank + f" ~ {mmr['RankedRating']} RR"
                         showRank = False
-                    else:
 
-                        matchAgent = getSmallImage(client.getClient(), userState)
-                        smallText = matchAgent.split("_")[1].capitalize()
-                        smallImage = matchAgent
-                        showRank = True
-                elif matchFinished == True:
-                    
-                    mapAsset = presenceData["matchMap"].rsplit("/", 1)[1]
-                    Map = maps[mapAsset]
-                    largeImage = "splash_"+Map.lower()+"_square"
-                    matchAgent = getSmallImage(client.getClient(), userState)
-                    largeText = Map
-                    matchFinished = False
-                    smallText = matchAgent.split("_")[1].capitalize()
-                    smallImage = matchAgent
+        elif presenceData['partyState'] == "CUSTOM_GAME_SETUP":
+            if matchFinished == False:
+                matchFinished == True
+                matchAgent = None
+            matchmaking = True
+            if matchTimer == None:
+                matchTimer = time.time()
+            dots = ""
+            details = f"Setting Up a Custom Game{dots}"
+            mapAsset = presenceData["matchMap"].rsplit("/", 1)[1]
+            Map = maps[mapAsset]
+            largeImage = "splash_"+Map.lower()+"_square"
+            largeText = Map
+            dots+"."
+            if len(dots) >= 3:
+                dots = ""
 
-                
+        elif userState == "MENUS":
+            matchAgent = None
+            if matchFinished == False:
+                Presence = False
+                matchFinished == True
+            matchTimer = None
+            details = f"Lobby - {queue[queueId]}"
+            if presenceData["isIdle"] == True:
+                state = "Away"
+                smallImage = "away"
+
         else:
             time.sleep(config["presenceRefreshRate"])
             continue
@@ -339,27 +351,40 @@ def presenceLoop(client, rpc, pid, s):
                     if leadPos >= 500:
                         rank = f"Radiant #{leadPos}"
                 mmr = client.client.fetch_mmr()["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][Loader.load_all_content(client.client)["season"]["season_uuid"]]
-                smallText = rank + f" ~ {mmr['RankedRating']}RR"
+                smallText = rank + f" ~ {mmr['RankedRating']} RR"
                 data["small_image"] = smallImage
                 data["small_text"] = smallText
 
         if data != pastPresence and Presence == True:
             rpc.update(data)
             pastPresence = data
+
         time.sleep(config["presenceRefreshRate"])
-        if data != pastPresence and Presence == True:
-            rpc.clear(pid)
+        appOn = "RiotClientServices.exe" in (p.name() for p in psutil.process_iter())
+    rpc.clear(pid)
+    rpc.close(pid)
+    os._exit(0)
+            
+
 
 
 def getSmallImage(client:valclient.Client, userState):
     if userState == "PREGAME":
         user = client.pregame_fetch_player()
+        if user == None:
+            return agents[""]
         match = client.pregame_fetch_match(user["MatchID"])
-        for player in match["Players"]:
-            if player["Subject"] == user["Subject"]:
-                return agents[player["CharacterID"].upper()]
+
+        for team in match["Teams"]:
+            for player in team["Players"]:
+                if player == None:
+                    return ""
+                if player["Subject"] == user["Subject"]:
+                    return agents[player["CharacterID"].upper()]
     if userState == "INGAME":
         user = client.coregame_fetch_player()
+        if user == None:
+            return agents[""]
         match = client.coregame_fetch_match(user["MatchID"])
         for player in match["Players"]:
             if player["Subject"] == user["Subject"]:

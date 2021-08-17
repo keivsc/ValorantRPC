@@ -32,7 +32,6 @@ class Systray:
             self.conf.updateConf(config)
             self.rank = True
             not item.checked
-
     def run(self):
         global window_shown
         Systray.generate_icon()
