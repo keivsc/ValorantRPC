@@ -63,6 +63,7 @@ agents = {
 }
 
 rankName = {
+    "rank_0": "Unranked",
     "rank_3": "Iron 1",
     "rank_4": "Iron 2",
     "rank_5": "Iron 3",
@@ -290,8 +291,11 @@ def presenceLoop(client, rpc, pid, s):
                             rank = f"Immortal #{leadPos}"
                             if leadPos >= 500:
                                 rank = f"Radiant #{leadPos}"
-                        mmr = client.client.fetch_mmr()["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][Loader.load_all_content(client.client)["season"]["season_uuid"]]
-                        smallText = rank + f" ~ {mmr['RankedRating']} RR"
+                        try:
+                            mmr = client.client.fetch_mmr()["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][Loader.load_all_content(client.client)["season"]["season_uuid"]]
+                            smallText = rank + f" ~ {mmr['RankedRating']} RR"
+                        except:
+                            smallText = "Unranked"
                         showRank = False
 
         elif presenceData['partyState'] == "CUSTOM_GAME_SETUP":
@@ -350,8 +354,11 @@ def presenceLoop(client, rpc, pid, s):
                     rank = f"Immortal #{leadPos}"
                     if leadPos >= 500:
                         rank = f"Radiant #{leadPos}"
-                mmr = client.client.fetch_mmr()["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][Loader.load_all_content(client.client)["season"]["season_uuid"]]
-                smallText = rank + f" ~ {mmr['RankedRating']} RR"
+                try:
+                    mmr = client.client.fetch_mmr()["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][Loader.load_all_content(client.client)["season"]["season_uuid"]]
+                    smallText = rank + f" ~ {mmr['RankedRating']} RR"
+                except:
+                    smallText = "Unranked"
                 data["small_image"] = smallImage
                 data["small_text"] = smallText
 
