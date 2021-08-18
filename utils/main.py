@@ -104,6 +104,7 @@ def stop(s):
         os._exit(1)
     except:
         Presence = False
+        os._exit(1)
 
 def main(file):
     global Presence
