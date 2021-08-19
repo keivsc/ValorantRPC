@@ -12,16 +12,16 @@
 - Display Rank (toggleable)
 
 # Examples
-- Profile
+- Profile <br/>
 ![alt text](https://cdn.discordapp.com/attachments/701967775580815380/877752234685902968/unknown.png)
 
-- In Lobby
+- In Lobby <br/>
 ![alt text](https://cdn.discordapp.com/attachments/701967775580815380/877753154811346984/unknown.png)
 
-- In Queue
+- In Queue <br/>
 ![alt text](https://cdn.discordapp.com/attachments/701967775580815380/877753370704744458/unknown.png)
 
-- In Game
+- In Game <br/>
 ![alt text](https://cdn.discordapp.com/attachments/701967775580815380/877766232512802816/unknown.png)
 
 # Configuration
