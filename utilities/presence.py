@@ -1,3 +1,4 @@
+from utilities.game import Game
 from utilities.config.config import Config
 import pypresence
 from .clientMain import Client
@@ -5,6 +6,7 @@ from .config.config import Config
 import os
 import time
 import traceback
+import requests, urllib3
 
 class ValRPC():
     def __init__(self, rpcClient, region=None):
@@ -20,20 +22,22 @@ class ValRPC():
         showRank = False
         pastState = None
         matchTimer = None
-        inCustom = False
         dots = ""
         rotation = 1
         past = False
         while True:
 
+            if not Game.are_processes_running(["RiotClientServices.exe"]):
+                os._exit(1)
 
             rpcData = {
                 "pid":os.getpid()
             }
             try:
                 contentData = self.client.fetchPresence()
+
             except:
-                os._exit(1)
+                contentData = None
 
             if contentData == None:
                 if len(dots) >= 3:
@@ -52,10 +56,8 @@ class ValRPC():
 
                 state = ""
                 pastState = contentData["userState"]
-                if contentData["inCustom"] == True:
-                    inCustom = True
 
-                elif contentData["userState"] == "MENUS":
+                if contentData["userState"] == "MENUS":
                     matchTimer = None
 
                 elif pastState != contentData["userState"]:
@@ -94,7 +96,7 @@ class ValRPC():
 
                 if contentData["mapAsset"] == None:
                     rpcData["large_image"] = "game_icon"
-                    rpcData["large_text"] = "ValorantRPC"
+                    rpcData["large_text"] = "VALORANT"
                 else:
                     rpcData["large_image"] = contentData["mapAsset"]
                     rpcData["large_text"] = contentData["map"]

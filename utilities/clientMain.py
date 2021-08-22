@@ -121,7 +121,10 @@ class Client():
             "agent":None
         }
 
-        presence = self.client.fetch_presence()
+        try:
+            presence = self.client.fetch_presence()
+        except:
+            raise self.valorantIsOffline("Valorant is offline") 
 
         if presence == None:
             return None
