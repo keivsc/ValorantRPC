@@ -59,6 +59,7 @@ class Client():
         if self.region not in ["na","eu","latam","br","ap","kr","pbe"]:
             self.region = "na"
         self.client = valclient.Client(region=self.region)
+        self.ids = self.Config.getTranslation()
 
 
     ### startup use
@@ -121,10 +122,7 @@ class Client():
             "agent":None
         }
 
-        try:
-            presence = self.client.fetch_presence()
-        except:
-            raise self.valorantIsOffline("Valorant is offline") 
+        presence = self.client.fetch_presence() 
 
         if presence == None:
             return None
@@ -148,13 +146,14 @@ class Client():
         if presence["partyState"] == "MATCHMAKING":
             data["isMatchmaking"] = True
             data["queueTime"] = iso8601_to_epoch(presence["queueEntryTime"])
-            data["state"] = f"In Queue | {presence['queueId'].capitalize()}"
+            data["state"] = f"{self.ids['in-queue']} | {presence['queueId'].capitalize()}"
         
         if userState == "INGAME" or userState == "PREGAME":
             data["map"] = self.content.fetchMaps(presence["matchMap"])
-            data["mapAsset"] = f"splash_{data['map']}_square".replace("The ","").lower()
+            data["mapAsset"] = f"splash_{self.content.fetchMapAsset(presence['matchMap'])}_square".replace("The ","").lower()
             if presence["matchMap"] == "/Game/Maps/Poveglia/Range":
-                data["state"] = "The Range"
+                data["state"] = self.content.fetchMaps(presence["matchMap"])
+                data["mapAsset"] = f"splash_range_square".replace("The ","").lower()
             else:
                 data["state"] = f"{self.content.fetchMode(data['queueId']).capitalize()}"
                 if userState == "PREGAME":
@@ -164,30 +163,32 @@ class Client():
                     else:
                         Match = self.client.pregame_fetch_match(user["MatchID"])
                         data["pregameEndTime"] = (Match['PhaseTimeRemainingNS'] // 1000000000) + time.time()
-                    data["state"] = f"Pregame | {data['state']}"
+                    data["state"] = f"{self.ids['pregame']} | {data['state']}"
                     data["agent"] = self.content.fetchAgentName(self.fetchAgentID(userState))
+                    data["agentAsset"] = "agent_"+self.content.fetchAgentAsset(self.fetchAgentID(userState)).lower()
 
                 elif userState == "INGAME":
                     data["state"] = f"{data['state']} | {presence['partyOwnerMatchScoreAllyTeam']} : {presence['partyOwnerMatchScoreEnemyTeam']}"
                     data["agent"] = self.content.fetchAgentName(self.fetchAgentID(userState))
+                    data["agentAsset"] = "agent_"+self.content.fetchAgentAsset(self.fetchAgentID(userState)).lower()
                     if presence["partyState"] == "CUSTOM_GAME_SETUP":
                         data["inCustom"] = True
 
         if presence["partyState"] == "CUSTOM_GAME_SETUP" and userState != "PREGAME" and userState != "INGAME":
             if len(self.dots) >= 3:
                 self.dots = ""
-            data["state"] = f"Custom Game Setup{self.dots}"
+            data["state"] = f"{self.ids['custom-setup']}{self.dots}"
             data["inCustom"] = True
             data["map"] = self.content.fetchMaps(presence["matchMap"])
-            data["mapAsset"] = f"splash_{data['map']}_square".replace("The ","").lower()
+            data["mapAsset"] = f"splash_{self.content.fetchMapAsset(presence['matchMap'])}_square".replace("The ","").lower()
             self.dots += "."
 
         elif userState == "MENUS" and presence["partyState"] != 'MATCHMAKING':
-            data["state"] = f"Lobby - {self.content.fetchMode(data['queueId']).capitalize()}"
+            data["state"] = f"{self.ids['lobby']} - {self.content.fetchMode(data['queueId']).capitalize()}"
 
         if presence["isIdle"] == True:
             data["isIdle"] = True
-            data["state"] += " (Idle)"
+            data["state"] += f" ({self.ids['idle']})"
         
 
 

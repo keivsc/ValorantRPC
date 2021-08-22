@@ -23,38 +23,50 @@ class Loader():
             "agents":{
                 "":"unknown"
             },
+            "agentAssets":{
+                "":"unknown"
+            },
             "maps":{},
-            "queueAliases":{                
-                "newmap": "New Map",
-                "competitive": "Competitive",
-                "unrated": "Unrated",
-                "spikerush": "Spike Rush",
-                "deathmatch": "Deathmatch",
-                "ggteam": "Escalation",
-                "onefa": "Replication",
-                "custom": "Custom",
-                "snowball": "Snowball Fight",
-                "": "Custom Game",
+            "mapAssets":{},
+            "queueAliases":{
+
             }
         }
 
         agents = fetch("/agents", params)["data"]
         maps = fetch("/maps", params)["data"]
+        mapAssets = fetch("/maps", params={"language":"en-US"})['data']
+        agentAssets = fetch("/agents", params={"language":"en-US"})['data']
+        data["queueAliases"] = self.Config.getTranslation(lang)["queueAliases"]
+
 
         for agent in agents:
             data["agents"][f"{agent['uuid']}"] = agent["displayName"].replace('/', '')
+        
+        for agent in agentAssets:
+            data["agentAssets"][f"{agent['uuid']}"] = agent["displayName"].replace('/', '')
 
         for Map in maps:
             data["maps"][f"{Map['mapUrl']}"] = Map["displayName"]
 
+        for Map in mapAssets:
+            data["mapAssets"][f"{Map['mapUrl']}"] = Map["displayName"]
+
+        if not lang in self.config["languages"]:
+            lang = "en-US"
+            update = self.config
+            update["language"] = lang
+            self.Config.updateConf(update)
         self.content = data
-        update = self.config
-        update["language"] = "en-US"
-        self.Config.updateConf(update)
     
     def fetchAgentName(self, uuid):
         return self.content["agents"][uuid]
-    
+
+    def fetchAgentAsset(self, uuid):
+        return self.content["agentAssets"][uuid]
+
+    def fetchMapAsset(self, path):
+        return self.content["mapAssets"][path]
     
     def fetchMaps(self, path):
         return self.content["maps"][path]

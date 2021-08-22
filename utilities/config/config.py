@@ -2,9 +2,12 @@ import json
 import os
 import requests
 import sys
+import urllib
 
 configVers = "v1.2"
 ClientVers = "v2.0"
+
+
 
 class Filepath:
     @staticmethod 
@@ -36,6 +39,25 @@ defaultConfig = {
 }
 
 class Config:
+
+    @staticmethod
+    def createTranslation(language=None):
+        if not os.path.exists(Filepath.get_appdata_folder()):
+            os.mkdir(Filepath.get_appdata_folder())
+        urllib.request.urlretrieve('https://raw.githubusercontent.com/keivsc/ValorantRPC/v2/translations.json',Filepath.get_path(os.path.join(Filepath.get_appdata_folder(),'translations.json')))
+
+        return Config.getTranslation(language)
+
+    @staticmethod
+    def getTranslation(language=None):
+        if language == None:
+            language = Config.fetchConfig()["language"]
+        try:
+            with open(Filepath.get_path(os.path.join(Filepath.get_appdata_folder(), "translation.json"))) as f:
+                trans = json.load(f)
+                return trans[language]
+        except:
+            return Config.createTranslation(language)
 
     @staticmethod
     def checkConfig():
@@ -82,3 +104,5 @@ class Config:
         with open(Filepath.get_path(os.path.join(Filepath.get_appdata_folder(), "config.json")), "w") as f:
             json.dump(data, f, indent=4)
         return Config.fetchConfig()
+
+

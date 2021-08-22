@@ -16,6 +16,7 @@ class ValRPC():
         self.client = Client(region)
         self.client.activateClient()
         self.client.autoDetectRegion()
+        self.ids = self.Config.getTranslation()
 
     
     def startPresence(self):
@@ -57,7 +58,7 @@ class ValRPC():
                 state = ""
                 pastState = contentData["userState"]
 
-                if contentData["userState"] == "MENUS":
+                if contentData["userState"] == "MENUS" and contentData["inCustom"] == False:
                     matchTimer = None
 
                 elif pastState != contentData["userState"]:
@@ -77,22 +78,22 @@ class ValRPC():
                         matchTimer=time.time()
                     
                 if contentData["isPartyOpen"] == True and contentData["partySize"] > 2:
-                    state += f"Open Party | {contentData['partySize']} of {contentData['maxPartySize']}"
+                    state += f"{self.ids['open-party']} | {contentData['partySize']} / {contentData['maxPartySize']}"
 
                 elif contentData["isPartyOpen"] == False and contentData["partySize"] > 2:
-                    state += f"Closed Party | {contentData['partySize']} of {contentData['maxPartySize']}"
+                    state += f"{self.ids['close-party']} | {contentData['partySize']} / {contentData['maxPartySize']}"
 
                 elif contentData["partySize"] == 2:
-                    state += "Duo"
+                    state += f"{self.ids['duo']}"
                 
                 else:
-                    state += "Solo"
+                    state += f"{self.ids['solo']}"
                 
                 
 
                 if contentData["isIdle"] == True:
                     rpcData["small_image"] = "away"
-                    rpcData["small_text"] = "Away | Idle"
+                    rpcData["small_text"] = f"{self.ids['idle']}"
 
                 if contentData["mapAsset"] == None:
                     rpcData["large_image"] = "game_icon"
@@ -102,7 +103,7 @@ class ValRPC():
                     rpcData["large_text"] = contentData["map"]
 
                 if contentData["agent"] != None:
-                    rpcData["small_image"] = "agent_"+contentData["agent"].lower()
+                    rpcData["small_image"] = contentData["agentAsset"].lower()
                     rpcData["small_text"] = contentData["agent"]
                     if past == False:
                         past = True
@@ -110,7 +111,7 @@ class ValRPC():
                 if self.config["presence"]["show_rank"] == True:
                     if rotation >= 1 or contentData["userState"] == "MENUS":
                         rpcData["small_image"] = "rank_"+str(contentData["competitiveTier"])
-                        rpcData["small_text"] = f"{contentData['rank']}"
+                        rpcData["small_text"] = contentData["rank"]
                         if rotation >= 1:
                             rotation -= 1
                         past = False
@@ -121,10 +122,12 @@ class ValRPC():
                 
                 rpcData["start"] = matchTimer
                 rpcData["state"] = state
-
-                self.rpcClient.set_activity(**rpcData)
-                time.sleep(self.config["presenceRefreshRate"])
-                self.config = self.Config.fetchConfig()
+                try:
+                    self.rpcClient.set_activity(**rpcData)
+                    time.sleep(self.config["presenceRefreshRate"])
+                    self.config = self.Config.fetchConfig()
+                except:
+                    traceback.print_exc()
 
 
 
