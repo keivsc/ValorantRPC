@@ -1,0 +1,53 @@
+{
+
+    "en-US":{
+        "idle":"Idle",
+        "lobby":"Lobby",
+        "in-queue":"In Queue",
+        "pregame":"Pregame",
+        "in-game":"In Game",
+        "custom-setup":"Custom Game Setup",            
+        "open-party":"Open Party",
+        "close-party":"Closed Party",
+        "solo":"Solo",
+        "duo":"Duo",
+        "queueAliases":{                
+            "newmap": "New Map",
+            "competitive": "Competitive",
+            "unrated": "Unrated",
+            "spikerush": "Spike Rush",
+            "deathmatch": "Deathmatch", 
+            "ggteam": "Escalation",
+            "onefa": "Replication",
+            "custom": "Custom",
+            "snowball": "Snowball Fight",
+            "": "Custom Game"
+        }
+    },
+
+    "ja-JP":{
+        "idle":"アウェイ",
+        "lobby":"ロビー",
+        "in-queue":"キュー内",
+        "pregame":"ゲーム前",
+        "in-game":"ゲーム内",
+        "custom-setup":"カスタムゲーム",
+        "open-party":"オープンパーティー",
+        "close-party":"クローズドパーティー",
+        "solo":"ソロ",
+        "duo":"デュオ"
+    },
+    "queueAliases":{                
+        "newmap": "New Map",
+        "competitive": "コンペティティブ",
+        "unrated": "スタンダード",
+        "spikerush": "スパイクラッシュ",
+        "deathmatch": "デスマッチ",
+        "ggteam": "エスカレーション",
+        "onefa": "レプリケーション",
+        "custom": "カスタムゲーム",
+        "snowball": "スノーボールファイト",
+        "": "カスタムゲーム"
+    }
+
+}
