@@ -5,7 +5,7 @@ import sys
 import urllib
 
 configVers = "v1.2"
-ClientVers = "v2.0"
+ClientVers = "v2.2"
 
 
 
