@@ -5,6 +5,8 @@
 # Installation
 - Download the latest [release](https://github.com/keivsc/ValorantRPC/releases/) and run it
 
+[![Discord](https://img.shields.io/badge/discord-join-7389D8?style=flat&logo=discord)](https://discord.gg/qwzMafc6)
+
 # Features
 - Show current match and livestats
 - In queue status
