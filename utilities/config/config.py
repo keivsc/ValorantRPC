@@ -69,7 +69,11 @@ class Config:
                 conf["clientID"] = config["clientID"]
                 conf["presenceRefreshRate"] = config["presenceRefreshRate"]
                 conf["presence"]["show_rank"] = config["presence"]["show_rank"]
-                conf["startup"]["launch_timeout"] = config["startup"]["launch_timeout"] 
+                conf["startup"]["launch_timeout"] = config["startup"]["launch_timeout"]
+                try:
+                    conf["language"] = config["language"]
+                except:
+                    pass
                 with open(Filepath.get_path(os.path.join(Filepath.get_appdata_folder(), "config.json")), "w") as f:
                     f.truncate(0)
                     json.dump(conf, f, indent=4)

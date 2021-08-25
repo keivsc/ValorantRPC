@@ -38,7 +38,10 @@ def startup(systray=None):
     rpcClient = pypresence.Client(client_id=Config.fetchConfig()["clientID"])
     rpcClient.start()
     rpcClient.set_activity(**rpcData)
-    Game().start_game()
+    print(f"Client language: {Config.fetchConfig()['language']}")
+    game = Game().start_game()
+    if game == False:
+        os._exit(1)
     for x in range(5, -1, -1):
         print(f"[...] RPC Started! Hiding window in ({x})", end="\r")
         time.sleep(1)

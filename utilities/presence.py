@@ -7,6 +7,7 @@ import os
 import time
 import traceback
 import requests, urllib3
+from .systray import Systray
 
 class ValRPC():
     def __init__(self, rpcClient, region=None):
