@@ -36,18 +36,44 @@
         "close-party":"クローズドパーティー",
         "solo":"ソロ",
         "duo":"デュオ"
+		"queueAliases":{                
+			"newmap": "New Map",
+			"competitive": "コンペティティブ",
+			"unrated": "スタンダード",
+			"spikerush": "スパイクラッシュ",
+			"deathmatch": "デスマッチ",
+			"ggteam": "エスカレーション",
+			"onefa": "レプリケーション",
+			"custom": "カスタムゲーム",
+			"snowball": "スノーボールファイト",
+			"": "カスタムゲーム"
+		}
     },
-    "queueAliases":{                
-        "newmap": "New Map",
-        "competitive": "コンペティティブ",
-        "unrated": "スタンダード",
-        "spikerush": "スパイクラッシュ",
-        "deathmatch": "デスマッチ",
-        "ggteam": "エスカレーション",
-        "onefa": "レプリケーション",
-        "custom": "カスタムゲーム",
-        "snowball": "スノーボールファイト",
-        "": "カスタムゲーム"
-    }
 
+	
+    "ko-KR":{
+        "idle":"떨어져있는",
+        "lobby":"로비",
+        "in-queue":"대기열에서",
+        "pregame":"경기 전에",
+        "in-game":"게임에서"
+        "custom-setup":"커스텀 게임",
+        "open-party":"오픈 파티",
+        "close-party":"비공개 파티",
+        "solo":"독주",
+        "duo":"듀오"
+		"queueAliases":{                
+			"newmap": "New Map",
+			"competitive": "경쟁력있는",
+			"unrated": "기본",
+			"spikerush": "스파이크 돌격",
+			"deathmatch": "데스매치",
+			"ggteam": "에스컬레이션",
+			"onefa": "복제",
+			"custom": "커스텀 게임",
+			"snowball": "눈싸움",
+			"": "커스텀 게임"
+		}
+    }
+	
 }
