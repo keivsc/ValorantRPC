@@ -1,0 +1,4 @@
+pypresence
+valclient
+pystray
+requests
