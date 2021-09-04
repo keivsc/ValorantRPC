@@ -4,7 +4,7 @@ from utilities.client import client, contentLoader
 from utilities.misc import config, game
 from utilities.presence import menus, ingame, pregame
 from utilities import systray
-import requests, time, psutil, ctypes, PIL, valclient, threading, os, json, sys, InquirerPy, iso8601
+import requests, time, psutil, ctypes, PIL, valclient, threading, os, json, sys, InquirerPy, iso8601, pyperclip
 
 
 print(r""" 

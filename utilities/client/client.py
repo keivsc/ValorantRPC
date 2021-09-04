@@ -129,22 +129,23 @@ class Client():
         data["tier"] = self.Loader.data["competitiveTiers"][f"{gamePresence['competitiveTier']}"]
         data['queue'] = self.Loader.data["gamemodes"][gamePresence["queueId"]]
 
+        if self.config["show_party_count"] == True:
+            if data['partySize'] == 1:
+                data['partyCount'] = self.language['solo']
 
-        if data['partySize'] == 1:
-            data['partyCount'] = self.language['solo']
+            elif data['partySize'] == 2:
+                data['partyCount'] = self.language['duo']
 
-        elif data['partySize'] == 2:
-            data['partyCount'] = self.language['duo']
+            elif gamePresence["partyAccessibility"] == "OPEN":
+                data["partyAccess"] = True
+                data["partyCount"] += self.language["open-party"]
+                data["partyCount"] += f" | {data['partySize']} / {data['partyMax']}"
 
-        elif gamePresence["partyAccessibility"] == "OPEN":
-            data["partyAccess"] = True
-            data["partyCount"] += self.language["open-party"]
-            data["partyCount"] += f" | {data['partySize']} / {data['partyMax']}"
-
+            else:
+                data["partyCount"] += self.language["close-party"]
+                data["partyCount"] += f" | {data['partySize']} / {data['partyMax']}"
         else:
-            data["partyCount"] += self.language["close-party"]
-            data["partyCount"] += f" | {data['partySize']} / {data['partyMax']}"
-
+            data["partyCount"] = False
         
         
         if state == "INGAME" or state == "PREGAME":

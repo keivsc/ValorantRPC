@@ -1,6 +1,6 @@
 {
     "version": "v3",
-    "configVers":"v1.3",
+    "configVers":"v1.4",
     "region":"",
     "regions":["na", "eu", "latam", "br", "ap", "kr", "pbe"],
     "clientID": 876945941628858398,
@@ -8,7 +8,8 @@
     "languages":["en-US","ja-JP","ko-KR"],
     "presenceRefreshRate": 3,
     "presence":{
-        "show_rank": true
+        "show_rank": true,
+        "show_party_count":true
     },
     "startup":{
         "launch_timeout":60
