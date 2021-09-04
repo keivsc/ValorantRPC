@@ -9,6 +9,7 @@ import pypresence
 import time
 from pystray import Icon as icon, Menu as menu, MenuItem as item
 import ctypes, os, urllib.request, sys, time, pyperclip
+import traceback
 
 kernel32 = ctypes.WinDLL('kernel32')
 user32 = ctypes.WinDLL('user32')
@@ -21,13 +22,13 @@ def main():
     if config['language'] not in config['languages']:
         prompt().promptLanguage(config, Config())
     game = Game()
+    thread = threading.Thread(target=systray().run)
+    thread.start()
+    rpcClient = pypresence.Client(client_id=config["clientID"])
     game.start_game()
     valClient = Client()
     valClient.client.activate()
-    rpcClient = pypresence.Client(client_id=config["clientID"])
     rpcClient.start()
-    thread = threading.Thread(target=systray().run)
-    thread.start()
     for x in range(5, -1, -1):
         print(f"[...] RPC Started! Hiding window in ({x})", end="\r")
         time.sleep(1)
@@ -35,6 +36,7 @@ def main():
     print("Hiding Window! Have fun playing!!")
     time.sleep(.5)
     user32.ShowWindow(hWnd, 0)
+
 
     while True:
 
@@ -44,7 +46,8 @@ def main():
         try:
             presence = valClient.fetchPresence()
         except:
-            os._exit()
+            input(traceback.format_exc())
+            os._exit(1)
         rpcData = {
             "pid":os.getpid()
         }

@@ -64,4 +64,3 @@ class Loader:
             self.data["competitiveTiers"][tier]["displayName"] = tierName
             self.data["competitiveTiers"][tier]["assetName"] = f"rank_{tier}"
 
-

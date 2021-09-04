@@ -7,6 +7,7 @@ from InquirerPy import inquirer
 from ..systray import systray
 import iso8601
 import time
+import os
 
 def iso8601_to_epoch(time):
     if time == "0001.01.01-00.00.00":
@@ -110,10 +111,12 @@ class Client():
                 "agentAsset":None,
                 "mapAsset":None
             },
-            "Tier":{}
+            "tier":{}
         }
-        
-        gamePresence = self.client.fetch_presence()
+        try:
+            gamePresence = self.client.fetch_presence()
+        except:
+            os._exit(1)
 
         if gamePresence == None:
             return None
@@ -121,7 +124,6 @@ class Client():
         data['sessionLoopState'] = gamePresence["sessionLoopState"]
         state = gamePresence["sessionLoopState"]
         partyState = gamePresence['partyState']
-        print(partyState)
         data["partySize"] = gamePresence["partySize"]
         data["partyMax"] = gamePresence["maxPartySize"]
         data["tier"] = self.Loader.data["competitiveTiers"][f"{gamePresence['competitiveTier']}"]
@@ -148,8 +150,8 @@ class Client():
         if state == "INGAME" or state == "PREGAME":
             data["GameData"]["agent"] = self.Loader.data["agents"][""]["displayName"]
             data["GameData"]["agentAsset"] = self.Loader.data["agents"][""]["assetName"]
-            data["GameData"]["map"] = self.Loader.data["maps"]["matchMap"]["displayName"]
-            data["GameData"]["mapAsset"] = self.Loader.data["maps"]["matchMap"]["mapAsset"]
+            data["GameData"]["map"] = self.Loader.data["maps"][gamePresence["matchMap"]]["displayName"]
+            data["GameData"]["mapAsset"] = self.Loader.data["maps"][gamePresence["matchMap"]]["assetName"]
 
             if state == "PREGAME":
                 

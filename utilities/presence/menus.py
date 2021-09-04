@@ -17,6 +17,9 @@ class Presence():
         while self.loop:
             presence = self.client.fetchPresence()
 
+            if presence == None:
+                continue
+
             if self.loop != presence['inMenus']:
                self.loop = presence['inMenus']
                continue

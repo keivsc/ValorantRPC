@@ -23,11 +23,11 @@ class systray:
             item.checked
             config["presence"]["show_rank"] = False
             self.Config.updateConf(config)
-            self.rank = False
+            self.showRank = False
         else:
             config["presence"]["show_rank"] = True
             self.Config.updateConf(config)
-            self.rank = True
+            self.showRank = True
             not item.checked
 
     def run(self):
