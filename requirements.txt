@@ -1,0 +1,9 @@
+pypresence
+valclient
+pystray
+requests
+psutil
+InquirerPy
+iso8601
+pyperclip
+pillow
