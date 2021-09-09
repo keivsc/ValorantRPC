@@ -8,6 +8,7 @@
     "custom-setup": "Custom Game Setup",
     "open-party": "Open Party",
     "close-party": "Closed Party",
+    "party-leader":"Party Leader",
     "solo": "Solo",
     "duo": "Duo",
     "queueAliases": {
@@ -32,6 +33,7 @@
     "custom-setup": "カスタムゲーム",
     "open-party": "オープンパーティー",
     "close-party": "クローズドパーティー",
+    "party-leader":"党首",
     "solo": "ソロ",
     "duo": "デュオ",
     "queueAliases": {
@@ -56,6 +58,7 @@
     "custom-setup": "커스텀 게임",
     "open-party": "오픈 파티",
     "close-party": "비공개 파티",
+    "party-leader":"파티 소유자",
     "solo": "독주",
     "duo": "듀오",
     "queueAliases": {
