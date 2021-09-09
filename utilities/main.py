@@ -70,12 +70,19 @@ def main():
             rpcData["large_text"] = "Valorant"
             rpcData["small_image"] = "github_icon"
             rpcData["small_text"] = "https://github.com/keivsc/ValorantRPC"
-            rpcClient.set_activity(**rpcData)
+            try:
+                rpcClient.set_activity(**rpcData)
+            except:
+                print("Unable to Connect to discord is discord opened?")
+                pass
         else:
             presences = {
                 "INGAME":ingame,
                 "MENUS":menus,
                 "PREGAME":pregame
             }
-            presences[presence['sessionLoopState']].Presence(rpcClient).startPresence()
+            try:
+                presences[presence['sessionLoopState']].Presence(rpcClient).startPresence()
+            except:
+                pass
     

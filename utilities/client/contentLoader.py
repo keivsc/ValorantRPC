@@ -40,18 +40,18 @@ class Loader:
 
         for agent in agents[0]["data"]:
             self.data["agents"][agent["uuid"]] = {}
-            self.data["agents"][agent["uuid"]]["displayName"] = agent["displayName"]
+            self.data["agents"][agent["uuid"]]["displayName"] = agent["displayName"].capitalize()
 
         for item in maps[0]["data"]:
             self.data["maps"][item["mapUrl"]] = {}
-            self.data["maps"][item["mapUrl"]]["displayName"] = item["displayName"]
+            self.data["maps"][item["mapUrl"]]["displayName"] = item["displayName"].capitalize()
 
         for agent in agents[1]["data"]:
             self.data["agents"][agent["uuid"]]["assetName"] = f"agent_{(agent['displayName']).lower()}"
 
         for item in maps[1]["data"]:
             if item['mapUrl'] == "/Game/Maps/Poveglia/Range":
-                self.data["maps"][item["mapUrl"]]["assetName"] = f"splash_range_square"
+                self.data["maps"][item["mapUrl"]]["assetName"] = f"splash_range"
             else:
                 self.data["maps"][item["mapUrl"]]["assetName"] = f"splash_{(item['displayName']).lower()}_square"
 
@@ -61,6 +61,6 @@ class Loader:
             tierName = item["tierName"]
             if 21 <= int(tier) < 24:
                 tierName = tierName[:-1]
-            self.data["competitiveTiers"][tier]["displayName"] = tierName
+            self.data["competitiveTiers"][tier]["displayName"] = tierName.capitalize()
             self.data["competitiveTiers"][tier]["assetName"] = f"rank_{tier}"
 

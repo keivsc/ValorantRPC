@@ -20,8 +20,8 @@ class Presence():
             if presence == None:
                 continue
 
-            if self.loop != presence['inGame']:
-               self.loop = presence['inGame']
+            if self.loop != presence['inPregame']:
+               self.loop = presence['inPregame']
                continue
 
             data = {

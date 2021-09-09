@@ -145,72 +145,78 @@ class Client():
                 data["partyCount"] += self.language["close-party"]
                 data["partyCount"] += f" | {data['partySize']} / {data['partyMax']}"
         else:
-            data["partyCount"] = "  "
+            data["partyCount"] = None
         
-        
-        if state == "INGAME" or state == "PREGAME":
-            data["GameData"]["agent"] = self.Loader.data["agents"][""]["displayName"]
-            data["GameData"]["agentAsset"] = self.Loader.data["agents"][""]["assetName"]
-            data["GameData"]["map"] = self.Loader.data["maps"][gamePresence["matchMap"]]["displayName"]
-            data["GameData"]["mapAsset"] = self.Loader.data["maps"][gamePresence["matchMap"]]["assetName"]
+        try:
+            if state == "INGAME" or state == "PREGAME":
+                data["GameData"]["agent"] = self.Loader.data["agents"][""]["displayName"]
+                data["GameData"]["agentAsset"] = self.Loader.data["agents"][""]["assetName"]
+                data["GameData"]["map"] = self.Loader.data["maps"][gamePresence["matchMap"]]["displayName"]
+                data["GameData"]["mapAsset"] = self.Loader.data["maps"][gamePresence["matchMap"]]["assetName"]
 
-            if state == "PREGAME":
-                
-                data["inPregame"] = True
-                user = self.client.pregame_fetch_player()
-                if user == None:
-                    data ["time"] = 80 + time.time()
-                    data["GameData"]["agent"] = self.Loader.data["agents"][""]["displayName"]
-                    data["GameData"]["agentAsset"] = self.Loader.data["agents"][""]["assetName"]
+                if state == "PREGAME":
+                    
+                    data["inPregame"] = True
+                    user = self.client.pregame_fetch_player()
+                    if user == None:
+                        data ["time"] = 80 + time.time()
+                        data["GameData"]["agent"] = self.Loader.data["agents"][""]["displayName"]
+                        data["GameData"]["agentAsset"] = self.Loader.data["agents"][""]["assetName"]
 
+                    else:
+                        print(user)
+                        Match = self.client.pregame_fetch_match(user["MatchID"])
+                        data["time"] = (Match['PhaseTimeRemainingNS'] // 1000000000) + time.time()
+                        for team in Match["Teams"]:
+
+                            for player in team["Players"]:
+                                if player == None:
+                                    data["GameData"]["agent"] = self.Loader.data["agents"][""]["displayName"]
+
+                                if player["Subject"] == user["Subject"]:
+                                    data["GameData"]["agent"] = self.Loader.data["agents"][player["CharacterID"]]["displayName"]
+                                    data["GameData"]["agentAsset"] = self.Loader.data["agents"][player["CharacterID"]]["assetName"]
                 else:
-                    Match = self.client.pregame_fetch_match(user["matchID"])
-                    data["time"] = (Match['PhaseTimeRemainingNS'] // 1000000000) + time.time()
-                    for team in Match["Teams"]:
+                    if self.GameTime == 0:
+                        self.GameTime = time.time()
+                    data["time"] = self.GameTime
+                    data["inGame"] = True
+                    data["GameData"]["score"] = f"{gamePresence['partyOwnerMatchScoreAllyTeam']} : {gamePresence['partyOwnerMatchScoreEnemyTeam']}"
+                    user = self.client.coregame_fetch_player()
+                    if user == None:
+                        data["GameData"]["agent"] = self.Loader.data["agents"][""]["displayName"]
+                        data["GameData"]["agentAsset"] = self.Loader.data["agents"][""]["assetName"]
 
-                        for player in team["Players"]:
-                            if player == None:
-                                data["GameData"]["agent"] = self.Loader.data["agents"][""]["displayName"]
+                    else:
+                        Match = self.client.coregame_fetch_match(user["MatchID"])
 
+                        for player in Match["Players"]:
                             if player["Subject"] == user["Subject"]:
                                 data["GameData"]["agent"] = self.Loader.data["agents"][player["CharacterID"]]["displayName"]
                                 data["GameData"]["agentAsset"] = self.Loader.data["agents"][player["CharacterID"]]["assetName"]
-            else:
-                if self.GameTime == 0:
-                    self.GameTime = time.time()
-                data["time"] = self.GameTime
-                data["inGame"] = True
-                data["GameData"]["score"] = f"{gamePresence['partyOwnerMatchScoreAllyTeam']} : {gamePresence['partyOwnerMatchScoreEnemyTeam']}"
-                user = self.client.coregame_fetch_player()
-                if user == None:
-                    data["GameData"]["agent"] = self.Loader.data["agents"][""]["displayName"]
-                    data["GameData"]["agentAsset"] = self.Loader.data["agents"][""]["assetName"]
-
-                else:
-                    Match = self.client.coregame_fetch_match(user["MatchID"])
-
-                    for player in Match["Players"]:
-                        if player["Subject"] == user["Subject"]:
-                            data["GameData"]["agent"] = self.Loader.data["agents"][player["CharacterID"]]["displayName"]
-                            data["GameData"]["agentAsset"] = self.Loader.data["agents"][player["CharacterID"]]["assetName"]
 
 
         
-        elif partyState == "MATCHMAKING":
-            data["time"] = iso8601_to_epoch(gamePresence["queueEntryTime"])
+            elif partyState == "MATCHMAKING":
+                data["time"] = iso8601_to_epoch(gamePresence["queueEntryTime"])
 
-        elif state == "MENUS":
-            if self.GameTime != 0:
-                self.GameTime = 0
+            elif state == "MENUS":
+                if self.GameTime != 0:
+                    self.GameTime = 0
+                
+                data["inMenus"] = True
+
+            if partyState == "CUSTOM_GAME_SETUP":
+                data["inCustom"] = True
             
-            data["inMenus"] = True
+            if gamePresence["isIdle"] == True:
+                data["idle"] = True
 
-        if partyState == "CUSTOM_GAME_SETUP":
-            data["inCustom"] = True
-        
-        if gamePresence["isIdle"] == True:
-            data["idle"] = True
-        
+        except Exception as e:
+            print(e)
+            data['GameData']["mapAsset"] = "game_icon"
+            data['GameData']['map'] = "VALORANT"
+
         return data
 
         

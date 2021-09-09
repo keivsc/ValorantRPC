@@ -17,7 +17,6 @@ class Presence():
     def startPresence(self):
         while self.loop:
             presence = self.client.fetchPresence()
-
             if presence == None:
                 continue
 
@@ -50,20 +49,22 @@ class Presence():
 
                 try:
                     if self.config["presence"]["show_rank"] == True:
-                        if self.ShowRank == False:
+                        if self.ShowRank == False and presence['GameData']['mapAsset'] != "splash_range_square":
                             data['small_image'] = presence['GameData']['agentAsset']
-                            data['small_text'] = presence['GameData']['agent']
+                            data['small_text'] = (presence['GameData']['agent']).capitalize()
                             self.ShowRank = True
                         else:
                             data['small_image'] = presence['tier']['assetName']
                             data['small_text'] = presence['tier']['displayName']
                             self.ShowRank = False
                     else:
-                        data['small_image'] = presence['GameData']['agentAsset']
-                        data['small_text'] = presence['GameData']['agent']
+                        if presence['GameData']['mapAsset'] != "splash_range_square":
+                            data['small_image'] = presence['GameData']['agentAsset']
+                            data['small_text'] = (presence['GameData']['agent']).capitalize()
                 except:
-                    data['small_image'] = presence['GameData']['agentAsset']
-                    data['small_text'] = presence['GameData']['agent']
+                    if presence['GameData']['mapAsset'] != "splash_range_square":
+                        data['small_image'] = presence['GameData']['agentAsset']
+                        data['small_text'] = (presence['GameData']['agent']).capitalize()
 
 
             self.rpc.set_activity(**data)
