@@ -14,6 +14,7 @@ class Presence():
         self.client.client.activate()
         
     def startPresence(self):
+        pid = os.getpid()
         while self.loop:
             presence = self.client.fetchPresence()
 
@@ -21,21 +22,22 @@ class Presence():
                 continue
 
             if self.loop != presence['inMenus']:
-               self.loop = presence['inMenus']
-               continue
+               break
 
             data = {
-                "pid":os.getpid(),
+                "pid":pid,
             }
 
             
             data['state'] = presence["partyCount"]
 
-            data["details"] = f"{self.translation['lobby']} - {presence['queue']}"
-
-            if presence['time'] != None:
+            if presence['matchMaking'] == True: 
                 data["details"] = f"{self.translation['in-queue']} - {presence['queue']}"
                 data['start'] = presence['time']
+
+            else:
+                data["details"] = f"{self.translation['lobby']} - {presence['queue']}"
+
 
             data['large_image'] = "game_icon"
             data['large_text'] = "VALORANT"
@@ -47,6 +49,11 @@ class Presence():
             elif presence['idle'] == True:
                 data['small_image'] = "away"
                 data['small_text'] = self.translation['idle']
+            
+            elif presence['smallImage'] != None:
+                data['small_image'] = presence['smallImage']
+                data['small_text'] = self.translation["party-leader"]
+
 
             self.rpc.set_activity(**data)
             time.sleep(self.config["presenceRefreshRate"])

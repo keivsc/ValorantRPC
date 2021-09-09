@@ -14,6 +14,7 @@ class Presence():
         self.client.client.activate()
         
     def startPresence(self):
+        pid = os.getpid()
         while self.loop:
             presence = self.client.fetchPresence()
 
@@ -21,11 +22,10 @@ class Presence():
                 continue
 
             if self.loop != presence['inPregame']:
-               self.loop = presence['inPregame']
-               continue
+               break
 
             data = {
-                "pid":os.getpid(),
+                "pid":pid,
             }
 
             data["details"] = f"{presence['queue']} | {self.translation['pregame']}"

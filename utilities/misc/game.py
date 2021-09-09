@@ -31,7 +31,7 @@ class Game():
             print(f"[...] Waiting for VALORANT ({launch_timer}) - Timeout ({launch_timeout})", end="\r")
             launch_timer += 1
             if launch_timer >= launch_timeout:
-                return False
+               os._exit(1)
             time.sleep(1)
         if running == False:
             print()

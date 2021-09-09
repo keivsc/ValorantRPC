@@ -15,17 +15,17 @@ class Presence():
         self.ShowRank = False
         
     def startPresence(self):
+        pid = os.getpid()
         while self.loop:
             presence = self.client.fetchPresence()
             if presence == None:
                 continue
 
             if self.loop != presence['inGame']:
-               self.loop = presence['inGame']
-               continue
+               break
 
             data = {
-                "pid":os.getpid(),
+                "pid":pid,
             }
 
             if presence['GameData']['mapAsset'] == "splash_range_square":

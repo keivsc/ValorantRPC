@@ -94,6 +94,7 @@ class Client():
         data = {
             "sessionLoopState":None,
             "time":None,
+            "matchMaking":False,
             "inGame":False,
             "inPregame":False,
             "inMenus":False,
@@ -103,6 +104,7 @@ class Client():
             "ShowRank":None,
             "partySize":1,
             "partyMax":0,
+            "smallImage":None,
             "partyAccess":False,
             "GameData":{
                 "agent":None,
@@ -130,6 +132,12 @@ class Client():
         data['queue'] = self.Loader.data["gamemodes"][gamePresence["queueId"]]
 
         if self.config["presence"]["show_party_count"] == True:
+            if gamePresence['isPartyOwner'] == True:
+                data['smallImage'] = "partyowner"
+            else:
+                data['smallImage'] = None
+                data['smallText'] = None
+
             if data['partySize'] == 1:
                 data['partyCount'] = self.language['solo']
 
@@ -148,7 +156,12 @@ class Client():
             data["partyCount"] = None
         
         try:
-            if state == "INGAME" or state == "PREGAME":
+            if partyState == "MATCHMAKING":
+                data["time"] = iso8601_to_epoch(gamePresence["queueEntryTime"])
+                data['matchMaking'] = True
+                data["inMenus"] = True
+
+            elif state == "INGAME" or state == "PREGAME":
                 data["GameData"]["agent"] = self.Loader.data["agents"][""]["displayName"]
                 data["GameData"]["agentAsset"] = self.Loader.data["agents"][""]["assetName"]
                 data["GameData"]["map"] = self.Loader.data["maps"][gamePresence["matchMap"]]["displayName"]
@@ -164,7 +177,6 @@ class Client():
                         data["GameData"]["agentAsset"] = self.Loader.data["agents"][""]["assetName"]
 
                     else:
-                        print(user)
                         Match = self.client.pregame_fetch_match(user["MatchID"])
                         data["time"] = (Match['PhaseTimeRemainingNS'] // 1000000000) + time.time()
                         for team in Match["Teams"]:
@@ -196,9 +208,6 @@ class Client():
                                 data["GameData"]["agentAsset"] = self.Loader.data["agents"][player["CharacterID"]]["assetName"]
 
 
-        
-            elif partyState == "MATCHMAKING":
-                data["time"] = iso8601_to_epoch(gamePresence["queueEntryTime"])
 
             elif state == "MENUS":
                 if self.GameTime != 0:
@@ -208,12 +217,13 @@ class Client():
 
             if partyState == "CUSTOM_GAME_SETUP":
                 data["inCustom"] = True
+                data["GameData"]["map"] = self.Loader.data["maps"][gamePresence["matchMap"]]["displayName"]
+                data["GameData"]["mapAsset"] = self.Loader.data["maps"][gamePresence["matchMap"]]["assetName"]
             
             if gamePresence["isIdle"] == True:
                 data["idle"] = True
 
-        except Exception as e:
-            print(e)
+        except:
             data['GameData']["mapAsset"] = "game_icon"
             data['GameData']['map'] = "VALORANT"
 
