@@ -1,5 +1,5 @@
 {
-    "version": "v3",
+    "version": "v3.1",
     "configVers":"v1.4",
     "region":"",
     "regions":["na", "eu", "latam", "br", "ap", "kr", "pbe"],
