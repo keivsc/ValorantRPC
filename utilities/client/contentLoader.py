@@ -51,7 +51,7 @@ class Loader:
 
         for item in maps[1]["data"]:
             if item['mapUrl'] == "/Game/Maps/Poveglia/Range":
-                self.data["maps"][item["mapUrl"]]["assetName"] = f"splash_range"
+                self.data["maps"][item["mapUrl"]]["assetName"] = f"splash_range_square"
             else:
                 self.data["maps"][item["mapUrl"]]["assetName"] = f"splash_{(item['displayName']).lower()}_square"
 
