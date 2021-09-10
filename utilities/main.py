@@ -55,7 +55,7 @@ def main():
             os._exit(1)
 
         try:
-            presence = valClient.fetchPresence()
+            presence = valClient.fetchPresence(config)
         except:
             input(traceback.format_exc())
             os._exit(1)
@@ -82,7 +82,7 @@ def main():
                 "PREGAME":pregame
             }
             try:
-                presences[presence['sessionLoopState']].Presence(rpcClient).startPresence(config)
+                presences[presence['sessionLoopState']].Presence(rpcClient).startPresence()
             except:
                 pass
     
