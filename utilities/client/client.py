@@ -90,7 +90,7 @@ class Client():
             traceback.print_exc()
 
 
-    def fetchPresence(self):
+    def fetchPresence(self, config):
         data = {
             "sessionLoopState":None,
             "time":None,
@@ -131,7 +131,7 @@ class Client():
         data["tier"] = self.Loader.data["competitiveTiers"][f"{gamePresence['competitiveTier']}"]
         data['queue'] = self.Loader.data["gamemodes"][gamePresence["queueId"]]
 
-        if self.config["presence"]["show_party_count"] == True:
+        if config["presence"]["show_party_count"] == True:
             if gamePresence['isPartyOwner'] == True:
                 data['smallImage'] = "partyowner"
             else:
@@ -226,6 +226,7 @@ class Client():
         except:
             data['GameData']["mapAsset"] = "game_icon"
             data['GameData']['map'] = "VALORANT"
+
 
         return data
 

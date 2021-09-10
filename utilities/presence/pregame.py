@@ -16,7 +16,7 @@ class Presence():
     def startPresence(self):
         pid = os.getpid()
         while self.loop:
-            presence = self.client.fetchPresence()
+            presence = self.client.fetchPresence(self.config)
 
             if presence == None:
                 continue

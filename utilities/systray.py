@@ -15,6 +15,7 @@ class systray:
         self.config = self.Config.fetchConfig()
         self.systray = None
         self.showRank = self.config["presence"]["show_rank"]
+        self.party = self.config["presence"]["show_party_count"]
 
     def updateRank(self, icon, item):
         config = self.Config.fetchConfig()
@@ -30,6 +31,21 @@ class systray:
             self.showRank = True
             not item.checked
 
+    def updateParty(self, icon, item):
+        config = self.Config.fetchConfig()
+        party = config["presence"]["show_party_count"]
+        if party == True:
+            item.checked
+            config["presence"]["show_party_count"] = False
+            self.Config.updateConf(config)
+            self.party = False
+        else:
+            config["presence"]["show_party_count"] = True
+            self.Config.updateConf(config)
+            self.party = True
+            not item.checked
+
+
     def run(self):
         global window_shown
         self.generate_icon()
@@ -37,6 +53,7 @@ class systray:
         systray_menu = menu(
             item('Show window', systray.tray_window_toggle, checked=lambda item: window_shown),
             item(f'Toggle Rank Display', self.updateRank, checked=lambda item: self.showRank),
+            item(f'Toggle Party Display', self.updateParty, checked=lambda item: self.party),
             item('Restart', systray.restart),
             item('Exit', self.exitF)
         )

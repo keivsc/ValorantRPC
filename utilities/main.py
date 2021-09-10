@@ -82,7 +82,7 @@ def main():
                 "PREGAME":pregame
             }
             try:
-                presences[presence['sessionLoopState']].Presence(rpcClient).startPresence()
+                presences[presence['sessionLoopState']].Presence(rpcClient).startPresence(config)
             except:
                 pass
     
