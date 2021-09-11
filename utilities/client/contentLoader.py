@@ -81,5 +81,5 @@ class Loader:
                 self.data["competitiveTiers"][tier]["displayName"] = tierName.capitalize()
             self.data["competitiveTiers"][tier]["assetName"] = f"rank_{tier}"
     
-        print(self.data)
+
 
