@@ -2,6 +2,18 @@ import json
 import requests
 from ..misc.config import Config
 
+def convertNumeral(string):
+    romanNumerals = {
+            "1":"I",
+            "2":"II",
+            "3":"III"
+        }
+    for i in list(romanNumerals.keys()):
+        if i in string:
+            return string.replace(i, romanNumerals[i])
+    return string
+
+
 def fetch(endpoint="/", language="en-US"):
     res = requests.get(f"https://valorant-api.com/v1{endpoint}", params={"language":language})
     resp = requests.get(f"https://valorant-api.com/v1{endpoint}", params={"language":"en-US"})
@@ -18,7 +30,7 @@ class Loader:
         self.data = {
             "agents":{
                 "":{
-                    "displayName":"unknown",
+                    "displayName":"Unknown",
                     "assetName":"agent_unknown"
                 }
 
@@ -61,6 +73,13 @@ class Loader:
             tierName = item["tierName"]
             if 21 <= int(tier) < 24:
                 tierName = tierName[:-1]
-            self.data["competitiveTiers"][tier]["displayName"] = tierName.capitalize()
+            if self.config['presence']['use_roman_numerals'] == True:
+                print('true')
+                self.data["competitiveTiers"][tier]["displayName"] = convertNumeral(tierName.capitalize())
+            else:
+                print('false')
+                self.data["competitiveTiers"][tier]["displayName"] = tierName.capitalize()
             self.data["competitiveTiers"][tier]["assetName"] = f"rank_{tier}"
+    
+        print(self.data)
 

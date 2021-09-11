@@ -1,6 +1,6 @@
 {
     "version": "v3.1",
-    "configVers":"v1.4",
+    "configVers":"v1.5",
     "region":"",
     "regions":["na", "eu", "latam", "br", "ap", "kr", "pbe"],
     "clientID": 876945941628858398,
@@ -9,6 +9,7 @@
     "presenceRefreshRate": 3,
     "presence":{
         "show_rank": true,
+		"use_roman_numerals":true,
         "show_party_count":true
     },
     "startup":{
