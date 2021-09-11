@@ -74,10 +74,8 @@ class Loader:
             if 21 <= int(tier) < 24:
                 tierName = tierName[:-1]
             if self.config['presence']['use_roman_numerals'] == True:
-                print('true')
                 self.data["competitiveTiers"][tier]["displayName"] = convertNumeral(tierName.capitalize())
             else:
-                print('false')
                 self.data["competitiveTiers"][tier]["displayName"] = tierName.capitalize()
             self.data["competitiveTiers"][tier]["assetName"] = f"rank_{tier}"
     
