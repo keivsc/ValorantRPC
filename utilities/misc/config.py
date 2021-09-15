@@ -40,7 +40,7 @@ class Config:
                     newConf[item] = newConf[item]
 
             try:
-                newConf["presence"]["show_rank"] = config["region"] 
+                newConf["presence"]["show_rank"] = config["presence"]["show_rank"] 
             except:
                 newConf["presence"]["show_rank"] = True
 
