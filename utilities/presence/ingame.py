@@ -5,13 +5,12 @@ from ..misc.config import Config
 import traceback
 
 class Presence():
-    def __init__(self, rpcClient) -> None:
+    def __init__(self, rpcClient, valClient) -> None:
         self.Config = Config
         self.config = self.Config.fetchConfig()
-        self.client = Client()
+        self.client = valClient
         self.rpc = rpcClient
         self.loop = True
-        self.client.client.activate()
         self.ShowRank = False
         
     def startPresence(self):
@@ -35,8 +34,8 @@ class Presence():
                 data['large_text'] = "The Range"
                 try:
                     if self.config["presence"]["show_rank"] == True:
-                        data['small_image'] = presence['GameData']['agentAsset']
-                        data['small_text'] = presence['GameData']['agent']
+                        data['small_image'] = presence['tier']['assetName']
+                        data['small_text'] = presence['tier']['displayName']
 
                 except:
                     data['small_image'] = None

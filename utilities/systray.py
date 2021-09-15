@@ -2,7 +2,10 @@ from PIL import Image
 from pystray import Icon as icon, Menu as menu, MenuItem as item
 import ctypes, os, urllib.request, sys, time, pyperclip
 from .misc.config import Config
-
+from .matchStats.stats import Stats
+from plyer import notification
+from .misc.game import Game
+from PIL import Image
 kernel32 = ctypes.WinDLL('kernel32')
 user32 = ctypes.WinDLL('user32')
 hWnd = kernel32.GetConsoleWindow()
@@ -16,6 +19,8 @@ class systray:
         self.systray = None
         self.showRank = self.config["presence"]["show_rank"]
         self.party = self.config["presence"]["show_party_count"]
+        self.game = Game()
+        self.stat = Stats(self.config['region'], self.Config)
 
     def updateRank(self, icon, item):
         config = self.Config.fetchConfig()
@@ -45,6 +50,28 @@ class systray:
             self.party = True
             not item.checked
 
+    def matchStats(self):
+        if self.game.are_processes_running(["RiotClientServices.exe"]) == True:
+            if self.config['matchSheet'] == True:
+                path = self.stat.loadImage()
+                notification.notify(
+                    title='Match Sheet Created!',
+                    message='You can get the path in the console window!',
+                    app_icon=self.Config.get_path(os.path.join(self.Config.get_appdata_folder(), 'favicon.ico'))
+                )
+                Image.open(path).show()
+            else:
+                notification.notify(
+                    title='Unable to create match sheet',
+                    message='Enable matchSheet creation in the config file!',
+                    app_icon=self.Config.get_path(os.path.join(self.Config.get_appdata_folder(), 'favicon.ico'))
+                )
+        else:
+            notification.notify(
+                title='Unable to create match sheet',
+                message='Please wait until VALORANT is opened!',
+                app_icon=self.Config.get_path(os.path.join(self.Config.get_appdata_folder(), 'favicon.ico'))
+            )
 
     def run(self):
         global window_shown
@@ -52,6 +79,7 @@ class systray:
         systray_image = Image.open(self.Config.get_path(os.path.join(self.Config.get_appdata_folder(), 'favicon.ico')))
         systray_menu = menu(
             item('Show window', systray.tray_window_toggle, checked=lambda item: window_shown),
+            item('Create Latest Match Stats', self.matchStats),
             item(f'Toggle Rank Display', self.updateRank, checked=lambda item: self.showRank),
             item(f'Toggle Party Display', self.updateParty, checked=lambda item: self.party),
             item('Restart', systray.restart),

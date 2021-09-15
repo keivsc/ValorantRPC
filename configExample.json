@@ -1,12 +1,13 @@
 {
-    "version": "v3.2",
-    "configVers":"v1.5",
+    "version": "v3.3",
+    "configVers":"v1.6",
     "region":"",
     "regions":["na", "eu", "latam", "br", "ap", "kr", "pbe"],
     "clientID": 876945941628858398,
     "language":"",
     "languages":["en-US","ja-JP","ko-KR"],
     "presenceRefreshRate": 3,
+	"matchSheet":false,
     "presence":{
         "show_rank": true,
 		"use_roman_numerals":true,

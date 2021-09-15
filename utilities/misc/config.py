@@ -32,7 +32,7 @@ class Config:
             for x in items:
                 newConf[x] = latestConfig[x]
 
-            items = ["region", "clientID", "language", "presenceRefreshRate"]
+            items = ["region", "clientID", "language", "presenceRefreshRate", "matchSheet"]
             for item in items:
                 try:
                     newConf[item] = config[item] 

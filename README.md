@@ -31,17 +31,20 @@
 ```json
 # Note: Configuration will now be automatic
 {
-    "version": "v2.3",
-    "configVers":"v1.3",
+
+    "version": "v3.3",
+    "configVers":"v1.6",
     "region":"",
     "regions":["na", "eu", "latam", "br", "ap", "kr", "pbe"],
     "clientID": 876945941628858398,
     "language":"",
     "languages":["en-US","ja-JP","ko-KR"],
     "presenceRefreshRate": 3,
+	"matchSheet":false,
     "presence":{
         "show_rank": true,
-	"show_party_count":true,
+		"use_roman_numerals":true,
+        "show_party_count":true
     },
     "startup":{
         "launch_timeout":60

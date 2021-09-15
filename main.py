@@ -5,7 +5,7 @@ from utilities.misc import config, game
 from utilities.presence import menus, ingame, pregame
 from utilities import systray
 import pystray._win32
-import requests, time, psutil, ctypes, PIL, valclient, threading, os, json, sys, InquirerPy, iso8601, pyperclip
+import requests, time, psutil, ctypes, PIL, valclient, threading, os, json, sys, InquirerPy, iso8601, pyperclip, plyer
 
 
 print(r""" 

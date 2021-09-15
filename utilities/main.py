@@ -10,6 +10,8 @@ import time
 from pystray import Icon as icon, Menu as menu, MenuItem as item
 import ctypes, os, urllib.request, sys, time, pyperclip
 import traceback
+from .matchStats.stats import Stats
+from .matchStats.utils import contentLoader
 
 kernel32 = ctypes.WinDLL('kernel32')
 user32 = ctypes.WinDLL('user32')
@@ -21,10 +23,13 @@ def main():
     config = Config().fetchConfig()
     if config['language'] not in config['languages']:
         prompt().promptLanguage(config, Config())
+    if config['matchSheet'] == True:
+        contentLoader.Loader.createAssets()
     game = Game()
     thread = threading.Thread(target=systray().run)
     thread.start()
     rpcClient = pypresence.Client(client_id=config["clientID"])
+    os.system('cls')
     game.start_game()
     valClient = Client()
     valClient.client.activate()
@@ -47,10 +52,11 @@ def main():
     print("Hiding Window! Have fun playing!!")
     time.sleep(.5)
     user32.ShowWindow(hWnd, 0)
-
+    os.system('cls')
+    
+    print("Discord Rich Presence has started! You can reconnect via the system tray if your discord has crashed.")
 
     while True:
-
         if not game.are_processes_running(["RiotClientServices.exe"]):
             os._exit(1)
 
@@ -82,7 +88,7 @@ def main():
                 "PREGAME":pregame
             }
             try:
-                presences[presence['sessionLoopState']].Presence(rpcClient).startPresence()
+                presences[presence['sessionLoopState']].Presence(rpcClient, valClient).startPresence()
             except:
                 pass
-    
+        

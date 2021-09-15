@@ -4,14 +4,13 @@ import time
 from ..misc.config import Config
 
 class Presence():
-    def __init__(self, rpcClient) -> None:
+    def __init__(self, rpcClient, valClient) -> None:
         self.Config = Config()
         self.config = self.Config.fetchConfig()
-        self.client = Client()
+        self.client = valClient
         self.rpc = rpcClient
         self.loop = True
         self.translation = self.Config.getTranslation()[self.config['language']]
-        self.client.client.activate()
         
     def startPresence(self):
         pid = os.getpid()
