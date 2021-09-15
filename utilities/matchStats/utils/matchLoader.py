@@ -15,10 +15,17 @@ class Valorant:
         
         content = Loader.load_all_content(self.client)
         matches = self.client.fetch_match_history()["History"]
-        matchid = matches[0]["MatchID"]
-        match_data = self.client.fetch_match_details(matchid)
+        tries = 0
+        while tries < 5:
+            matchid = matches[tries]["MatchID"]
+            match_data = self.client.fetch_match_details(matchid)
+            if match_data["matchInfo"]["queueID"] != "deathmatch":
+                break
+            else:
+                tries+=1
+        if tries > 5:
+            return False
 
-        
         total_rounds = len(match_data["roundResults"])
 
         if match_data["matchInfo"]["queueID"] != "deathmatch":
