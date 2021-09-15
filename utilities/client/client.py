@@ -93,6 +93,7 @@ class Client():
     def fetchPresence(self, config):
         data = {
             "sessionLoopState":None,
+            "level":0,
             "time":None,
             "matchMaking":False,
             "inGame":False,
@@ -124,6 +125,7 @@ class Client():
             return None
 
         data['sessionLoopState'] = gamePresence["sessionLoopState"]
+        data['level'] = self.client.fetch_account_xp()['Progress']['Level']
         state = gamePresence["sessionLoopState"]
         partyState = gamePresence['partyState']
         data["partySize"] = gamePresence["partySize"]

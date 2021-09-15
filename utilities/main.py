@@ -41,7 +41,7 @@ def main():
     rpcData["buttons"] = []
     rpcData["buttons"].append({"label":"View on GitHHub", "url":"https://github.com/keivsc/ValorantRPC"})
     rpcData["large_image"] = "game_icon"
-    rpcData["large_text"] = "Valorant"
+    rpcData["large_text"] = "VALORANT"
     rpcData["small_image"] = "github_icon"
     rpcData["small_text"] = "https://github.com/keivsc/ValorantRPC"
     rpcClient.set_activity(**rpcData)

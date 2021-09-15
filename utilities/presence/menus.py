@@ -39,7 +39,7 @@ class Presence():
 
 
             data['large_image'] = "game_icon"
-            data['large_text'] = "VALORANT"
+            data['large_text'] = f"Level {presence['level']}"
             
             if self.config['presence']['show_rank'] == True:
                 data['small_image'] = presence['tier']['assetName']
