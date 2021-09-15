@@ -1,7 +1,7 @@
 {
   "en-US": {
     "idle": "Idle",
-    "lobby": "Lobby",
+    "lobby": "Menu",
     "in-queue": "In Queue",
     "pregame": "Pregame",
     "in-game": "In Game",
@@ -26,7 +26,7 @@
   },
   "ja-JP": {
     "idle": "アウェイ",
-    "lobby": "ロビー",
+    "lobby": "メニュー",
     "in-queue": "キュー内",
     "pregame": "ゲーム前",
     "in-game": "ゲーム内",
@@ -51,7 +51,7 @@
   },
   "ko-KR": {
     "idle": "떨어져있는",
-    "lobby": "로비",
+    "lobby": "메뉴",
     "in-queue": "대기열에서",
     "pregame": "경기 전에",
     "in-game": "게임에서",
