@@ -3,11 +3,12 @@ from .utils.imageBuilder import Builder
 
 class Stats:
     def __init__(self, region, appdata):
-        self.data = Valorant(region=region).load_match_data()
         self.appdata = appdata
+        self.region = region
 
     def loadImage(self):
-        builder = Builder(self.data, self.appdata)
+        data = Valorant(region=self.region).load_match_data()
+        builder = Builder(data, self.appdata)
         path = builder.build_image()
         path = path.replace('/', '\\')
         print(f"\nLatest Match Sheet Created: {path}")

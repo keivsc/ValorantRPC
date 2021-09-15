@@ -7,7 +7,7 @@ from .contentLoader import Loader
 class Valorant:
 
     def __init__(self, region):
-        self.client = Client(region) 
+        self.client = Client(region)
         self.client.activate()
 
     def load_match_data(self):
