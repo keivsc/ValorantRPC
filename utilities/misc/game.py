@@ -3,6 +3,7 @@ import psutil
 import os
 import json
 from .config import Config
+from colorama import Fore
 
 class Game():
     def __init__(self) -> None:
@@ -28,14 +29,15 @@ class Game():
             running = False
             psutil.subprocess.Popen([path, "--launch-product=valorant", "--launch-patchline=live"])
         while not Game.are_processes_running():
-            print(f"[...] Waiting for VALORANT ({launch_timer}) - Timeout ({launch_timeout})", end="\r")
+            print(f"{Fore.RED}[...] Waiting for VALORANT ({launch_timer}) - Timeout ({launch_timeout})", end="\r")
             launch_timer += 1
             if launch_timer >= launch_timeout:
                os._exit(1)
             time.sleep(1)
         if running == False:
             print()
-        print("[√] Valorant detected and running!")
+            os.system('cls')
+        print(f"{Fore.GREEN}[√] Valorant detected and running!")
 
 
     def get_rcs_path(self):

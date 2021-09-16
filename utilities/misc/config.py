@@ -1,9 +1,12 @@
+from plyer.facades import notification
 import requests
 import json
 import os
 import sys
+from plyer import notification
 
 latestVersion = "v3"
+currentVersion = "v3.4"
 latestConfig = {}
 translationFile = {}
 
@@ -27,8 +30,15 @@ class Config:
     def checkConfig():
         config = Config().fetchConfig()
         newConf = latestConfig
+        newConf['version'] = currentVersion
+        if float(currentVersion.replace('v', '')) < float(latestConfig['version'].replace('v', '')):
+            notification.notify(
+                title='New Version of RPC is available',
+                message='Check out keivsc/ValorantRPC for the new version!',
+                app_icon=Config.get_path(os.path.join(Config.get_appdata_folder(), 'favicon.ico'))
+            )
         if config["configVers"] != latestConfig["configVers"] or config["version"] != latestConfig["version"]:
-            items = ["version", "configVers", "regions", "languages"]
+            items = ["configVers", "regions", "languages"]
             for x in items:
                 newConf[x] = latestConfig[x]
 

@@ -7,3 +7,5 @@ InquirerPy
 iso8601
 pyperclip
 pillow
+plyer
+colorama

@@ -1,6 +1,7 @@
 import requests,os,tqdm,time
 from zipfile import ZipFile
 import json
+from colorama import Fore
 
 class Loader:
 
@@ -19,7 +20,7 @@ class Loader:
         if os.path.exists(path.replace('.zip','')) == False:
             req = requests.get(f"https://raw.githubusercontent.com/keivsc/ValorantRPC/v3/matchAssets.zip")
 
-            with tqdm.tqdm(total=100, desc=f"Downloading matchStats assets") as pbar:
+            with tqdm.tqdm(total=100, desc=f"{Fore.BLUE}Downloading matchStats assets") as pbar:
                 i = 10
                 with open(path, 'wb') as f:
                     for chunk in req.iter_content(chunk_size=8192):
@@ -45,7 +46,7 @@ class Loader:
                 if vers['version'] != curVer['version']:
                     req = requests.get(f"https://raw.githubusercontent.com/keivsc/ValorantRPC/v3/matchAssets.zip")
 
-                    with tqdm.tqdm(total=100, desc=f"Updating Match Report Assets") as pbar:
+                    with tqdm.tqdm(total=100, desc=f"{Fore.BLUE}Updating Match Report Assets") as pbar:
                         i = 10
                         with open(path, 'wb') as f:
                             for chunk in req.iter_content(chunk_size=8192):
@@ -63,7 +64,7 @@ class Loader:
             except:
                 req = requests.get(f"https://raw.githubusercontent.com/keivsc/ValorantRPC/v3/matchAssets.zip")
 
-                with tqdm.tqdm(total=100, desc=f"Updating Match Report Assets") as pbar:
+                with tqdm.tqdm(total=100, desc=f"{Fore.BLUE}Updating Match Report Assets") as pbar:
                     i = 10
                     with open(path, 'wb') as f:
                         for chunk in req.iter_content(chunk_size=8192):

@@ -2,7 +2,7 @@ from .utils.matchLoader import Valorant
 from .utils.imageBuilder import Builder
 from plyer import notification
 import os
-
+from colorama import Fore
 class Stats:
     def __init__(self, region, appdata):
         self.appdata = appdata
@@ -20,5 +20,5 @@ class Stats:
         builder = Builder(data, self.appdata)
         path = builder.build_image()
         path = path.replace('/', '\\')
-        print(f"\nLatest Match Sheet Created: {path}")
+        print(f"\n{Fore.GREEN}Latest Match Report Created: {path}")
         return path

@@ -12,6 +12,7 @@ import ctypes, os, urllib.request, sys, time, pyperclip
 import traceback
 from .matchStats.stats import Stats
 from .matchStats.utils import contentLoader
+from colorama import Fore
 
 kernel32 = ctypes.WinDLL('kernel32')
 user32 = ctypes.WinDLL('user32')
@@ -46,15 +47,34 @@ def main():
     rpcData["small_text"] = "https://github.com/keivsc/ValorantRPC"
     rpcClient.set_activity(**rpcData)
     for x in range(5, -1, -1):
-        print(f"[...] RPC Started! Hiding window in ({x})", end="\r")
+        print(f"{Fore.BLUE}Rich Presence Started | Hiding window in ({x})", end="\r")
         time.sleep(1)
     print()
-    print("Hiding Window! Have fun playing!!")
+    print(f"{Fore.GREEN}Hiding Window! Have fun playing!!")
     time.sleep(.5)
     user32.ShowWindow(hWnd, 0)
     os.system('cls')
     
-    print("Discord Rich Presence has started! You can reconnect via the system tray if your discord has crashed.")
+    print(f""" {Fore.RED}
+__________________
+|   __      __   |       :::     :::     :::     :::        ::::::::  :::::::::      :::     ::::    ::: ::::::::::: 
+|   \ \    / /   |      :+:     :+:   :+: :+:   :+:       :+:    :+: :+:    :+:   :+: :+:   :+:+:   :+:     :+:      
+|    \ \  / /    |     +:+     +:+  +:+   +:+  +:+       +:+    +:+ +:+    +:+  +:+   +:+  :+:+:+  +:+     +:+   
+|     \ \/ /     |    +#+     +:+ +#++:++#++: +#+       +#+    +:+ +#++:++#:  +#++:++#++: +#+ +:+ +#+     +#+     
+|      \  /      |    +#+   +#+  +#+     +#+ +#+       +#+    +#+ +#+    +#+ +#+     +#+ +#+  +#+#+#     +#+
+|       \/       |    #+#+#+#   #+#     #+# #+#       #+#    #+# #+#    #+# #+#     #+# #+#   #+#+#     #+#    
+|________________|     ###     ###     ### ########## ########  ###    ### ###     ### ###    ####     ###    
+    """)
+
+    print(f"""{Fore.GREEN}
+                 |    :::::::::  :::::::::   ::::::::  
+                 |    :+:    :+: :+:    :+: :+:    :+: 
+                 |    +:+    +:+ +:+    +:+ +:+        
+                 |    +#++:++#:  +#++:++#+  +#+        
+                 |    +#+    +#+ +#+        +#+        
+                 |    #+#    #+# #+#        #+#    #+# 
+                 |    ###    ### ###         ########  
+    """)
 
     while True:
         if not game.are_processes_running(["RiotClientServices.exe"]):
@@ -79,7 +99,8 @@ def main():
             try:
                 rpcClient.set_activity(**rpcData)
             except:
-                print("Unable to Connect to discord is discord opened?")
+                print(f"{Fore.WHITE}-"*30)
+                print(f"{Fore.RED}Unable to Connect to discord is discord opened?")
                 pass
         else:
             presences = {

@@ -8,7 +8,7 @@ from ..systray import systray
 import iso8601
 import time
 import os
-
+from colorama import Fore
 def iso8601_to_epoch(time):
     if time == "0001.01.01-00.00.00":
         return None
@@ -24,7 +24,7 @@ class prompt:
     @staticmethod
     def promptLanguage(config, Config):
         choice = inquirer.select(
-            message="Select your language (Use arrow keys): ",
+            message=f"Select your language (Use arrow keys): ",
             default="en-US",
             choices={option:option for option in config["languages"]},
             pointer=">"
@@ -65,8 +65,8 @@ class Client():
     def autoDetectRegion(self):
         if self.config["region"] not in ["na","eu","latam","br","ap","kr","pbe"]:
             self.client.activate()
-            print("--------------------------")
-            print("Auto detecting region...")
+            print(f"{Fore.GREEN}--------------------------")
+            print(f"{Fore.BLUE}Auto detecting region...")
             sessions = self.client.riotclient_session_fetch_sessions()
             for _, session in sessions.items():
                 if session["productId"] == "valorant":
@@ -77,7 +77,7 @@ class Client():
                             data = self.config
                             data["region"] = region
                             self.Config.updateConf(data)
-                            print(f"Region Detected - {region.upper()}")
+                            print(f"{Fore.GREEN}Region Detected - {region.upper()}")
                             print("--------------------------")
                             time.sleep(1)
                             systray.restart()
