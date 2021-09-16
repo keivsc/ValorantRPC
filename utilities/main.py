@@ -18,7 +18,7 @@ kernel32 = ctypes.WinDLL('kernel32')
 user32 = ctypes.WinDLL('user32')
 hWnd = kernel32.GetConsoleWindow()
 
-def main():
+def main(programManager):
     configActivate()
     Config().checkConfig()
     config = Config().fetchConfig()
@@ -27,11 +27,11 @@ def main():
     if config['matchSheet'] == True:
         contentLoader.Loader.createAssets()
     game = Game()
-    thread = threading.Thread(target=systray().run)
+    thread = threading.Thread(target=systray(programManager).run)
     thread.start()
     rpcClient = pypresence.Client(client_id=config["clientID"])
     os.system('cls')
-    game.start_game()
+    game.start_game(programManager)
     valClient = Client()
     valClient.client.activate()
     rpcClient.start()
@@ -78,12 +78,16 @@ __________________
 
     while True:
         if not game.are_processes_running(["RiotClientServices.exe"]):
+            programManager.shutdown()
             os._exit(1)
+            
+
 
         try:
             presence = valClient.fetchPresence(config)
         except:
             input(traceback.format_exc())
+            programManager.shutdown()
             os._exit(1)
         rpcData = {
             "pid":os.getpid()

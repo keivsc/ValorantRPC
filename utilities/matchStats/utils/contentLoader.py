@@ -2,6 +2,7 @@ import requests,os,tqdm,time
 from zipfile import ZipFile
 import json
 from colorama import Fore
+import traceback
 
 class Loader:
 
@@ -40,10 +41,11 @@ class Loader:
             req = requests.get(f"https://raw.githubusercontent.com/keivsc/ValorantRPC/v3/matchAssets/reportVers.json")
             curVer = req.json()
             try:
-                with open(version, 'wb') as f:
-                    f = json.load(f)
-                    vers = f
-                if vers['version'] != curVer['version']:
+                with open(version) as f:
+                    vers = json.load(f)
+                    
+                print(vers, curVer)
+                if vers['Version'] != curVer['Version']:
                     req = requests.get(f"https://raw.githubusercontent.com/keivsc/ValorantRPC/v3/matchAssets.zip")
 
                     with tqdm.tqdm(total=100, desc=f"{Fore.BLUE}Updating Match Report Assets") as pbar:
@@ -62,6 +64,7 @@ class Loader:
 
                     os.remove(path)
             except:
+                traceback.print_exc()
                 req = requests.get(f"https://raw.githubusercontent.com/keivsc/ValorantRPC/v3/matchAssets.zip")
 
                 with tqdm.tqdm(total=100, desc=f"{Fore.BLUE}Updating Match Report Assets") as pbar:

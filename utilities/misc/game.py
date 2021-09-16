@@ -19,7 +19,7 @@ class Game():
         
         return set(required_processes).issubset(processes)
 
-    def start_game(self):
+    def start_game(self, programManager):
         path = self.get_rcs_path()
         launch_timeout = self.config["startup"]["launch_timeout"]
         launch_timer = 0
@@ -33,6 +33,7 @@ class Game():
             launch_timer += 1
             if launch_timer >= launch_timeout:
                os._exit(1)
+               programManager.shutdown()
             time.sleep(1)
         if running == False:
             print()

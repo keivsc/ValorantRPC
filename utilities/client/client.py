@@ -119,7 +119,7 @@ class Client():
         try:
             gamePresence = self.client.fetch_presence()
         except:
-            os._exit(1)
+            return None
 
         if gamePresence == None:
             return None
