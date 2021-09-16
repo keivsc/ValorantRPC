@@ -211,16 +211,20 @@ class Client():
 
 
 
-            elif state == "MENUS":
+            elif state == "MENUS" and partyState != "CUSTOM_GAME_SETUP":
                 if self.GameTime != 0:
                     self.GameTime = 0
                 
                 data["inMenus"] = True
 
             if partyState == "CUSTOM_GAME_SETUP":
+                data["inMenus"] = True
                 data["inCustom"] = True
                 data["GameData"]["map"] = self.Loader.data["maps"][gamePresence["matchMap"]]["displayName"]
                 data["GameData"]["mapAsset"] = self.Loader.data["maps"][gamePresence["matchMap"]]["assetName"]
+                if self.GameTime == 0:
+                    self.GameTime = time.time()
+                data['time'] = self.GameTime
             
             if gamePresence["isIdle"] == True:
                 data["idle"] = True

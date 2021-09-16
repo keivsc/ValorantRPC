@@ -2,9 +2,8 @@ from ..client.client import Client
 import os
 import time
 from ..misc.config import Config
-from .custom import CustomPresence
 
-class Presence():
+class CustomPresence():
     def __init__(self, rpcClient, valClient) -> None:
         self.Config = Config()
         self.config = self.Config.fetchConfig()
@@ -21,27 +20,18 @@ class Presence():
             if presence == None:
                 continue
 
-            if self.loop != presence['inMenus']:
+            if self.loop != presence['inCustom']:
                break
 
             data = {
                 "pid":pid,
             }
+
+            data['start'] = presence['time']
             data['state'] = presence["partyCount"]
-
-            if presence['inCustom'] == True:
-                CustomPresence(self.rpc, self.client).startPresence()
-
-            elif presence['matchMaking'] == True: 
-                data["details"] = f"{self.translation['in-queue']} - {presence['queue']}"
-                data['start'] = presence['time']
-
-            else:
-                data["details"] = f"{self.translation['lobby']} - {presence['queue']}"
-
-
-            data['large_image'] = "game_icon"
-            data['large_text'] = f"Level {presence['level']}"
+            data["details"] = f"{presence['queue']} | {presence['GameData']['map']}"
+            data['large_image'] = presence["GameData"]["mapAsset"]
+            data['large_text'] = presence["GameData"]["map"]
             
             if self.config['presence']['show_rank'] == True:
                 data['small_image'] = presence['tier']['assetName']

@@ -37,7 +37,7 @@
     "solo": "ソロ",
     "duo": "デュオ",
     "queueAliases": {
-      "newmap": "New Map",
+      "newmap": "新しい地図",
       "competitive": "コンペティティブ",
       "unrated": "スタンダード",
       "spikerush": "スパイクラッシュ",
@@ -62,7 +62,7 @@
     "solo": "독주",
     "duo": "듀오",
     "queueAliases": {
-      "newmap": "New Map",
+      "newmap": "새 지도",
       "competitive": "경쟁력있는",
       "unrated": "기본",
       "spikerush": "스파이크 돌격",

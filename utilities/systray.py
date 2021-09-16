@@ -53,22 +53,27 @@ class systray:
     def matchStats(self):
         if self.game.are_processes_running(["RiotClientServices.exe"]) == True:
             if self.config['matchSheet'] == True:
+                notification.notify(
+                    title='Creating Match Report!',
+                    message='Match Report will be created in a few seconds!',
+                    app_icon=self.Config.get_path(os.path.join(self.Config.get_appdata_folder(), 'favicon.ico'))
+                )
                 path = self.stat.loadImage()
                 notification.notify(
-                    title='Match Sheet Created!',
+                    title='Match Report Created!',
                     message='You can get the path in the console window!',
                     app_icon=self.Config.get_path(os.path.join(self.Config.get_appdata_folder(), 'favicon.ico'))
                 )
                 Image.open(path).show()
             else:
                 notification.notify(
-                    title='Unable to create match sheet',
+                    title='Unable to create match report',
                     message='Enable matchSheet creation in the config file!',
                     app_icon=self.Config.get_path(os.path.join(self.Config.get_appdata_folder(), 'favicon.ico'))
                 )
         else:
             notification.notify(
-                title='Unable to create match sheet',
+                title='Unable to create match report',
                 message='Please wait until VALORANT is opened!',
                 app_icon=self.Config.get_path(os.path.join(self.Config.get_appdata_folder(), 'favicon.ico'))
             )
@@ -79,9 +84,11 @@ class systray:
         systray_image = Image.open(self.Config.get_path(os.path.join(self.Config.get_appdata_folder(), 'favicon.ico')))
         systray_menu = menu(
             item('Show window', systray.tray_window_toggle, checked=lambda item: window_shown),
-            item('Create Latest Match Stats', self.matchStats),
-            item(f'Toggle Rank Display', self.updateRank, checked=lambda item: self.showRank),
-            item(f'Toggle Party Display', self.updateParty, checked=lambda item: self.party),
+            item('Create Latest Match Report', self.matchStats),
+            item('RPC Settings', menu(
+                item(f'Toggle Rank Display', self.updateRank, checked=lambda item: self.showRank),
+                item(f'Toggle Party Display', self.updateParty, checked=lambda item: self.party),
+            )),
             item('Restart', systray.restart),
             item('Exit', self.exitF)
         )

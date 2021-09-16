@@ -1,5 +1,6 @@
 import requests,os,tqdm,time
 from zipfile import ZipFile
+import json
 
 class Loader:
 
@@ -34,7 +35,50 @@ class Loader:
 
             os.remove(path)
         else:
-            pass
+            version = os.path.join(os.getenv("APPDATA"), "ValorantRPC/matchStats/reportVers.json")
+            req = requests.get(f"https://raw.githubusercontent.com/keivsc/ValorantRPC/v3/matchAssets/reportVers.json")
+            curVer = req.json()
+            try:
+                with open(version, 'wb') as f:
+                    f = json.load(f)
+                    vers = f
+                if vers['version'] != curVer['version']:
+                    req = requests.get(f"https://raw.githubusercontent.com/keivsc/ValorantRPC/v3/matchAssets.zip")
+
+                    with tqdm.tqdm(total=100, desc=f"Updating Match Report Assets") as pbar:
+                        i = 10
+                        with open(path, 'wb') as f:
+                            for chunk in req.iter_content(chunk_size=8192):
+                                if chunk:
+                                    f.write(chunk)
+                                    if i > 0:
+                                        pbar.update(10)
+                                        time.sleep(.1)
+                                        i-=1
+
+                    with ZipFile(path, 'r') as zip:
+                        zip.extractall(path.replace('/data.zip', ''))
+
+                    os.remove(path)
+            except:
+                req = requests.get(f"https://raw.githubusercontent.com/keivsc/ValorantRPC/v3/matchAssets.zip")
+
+                with tqdm.tqdm(total=100, desc=f"Updating Match Report Assets") as pbar:
+                    i = 10
+                    with open(path, 'wb') as f:
+                        for chunk in req.iter_content(chunk_size=8192):
+                            if chunk:
+                                f.write(chunk)
+                                if i > 0:
+                                    pbar.update(10)
+                                    time.sleep(.1)
+                                    i-=1
+
+                with ZipFile(path, 'r') as zip:
+                    zip.extractall(path.replace('/data.zip', ''))
+
+                os.remove(path)
+
 
 
     @staticmethod 
