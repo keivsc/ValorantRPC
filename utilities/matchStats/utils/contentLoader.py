@@ -44,7 +44,6 @@ class Loader:
                 with open(version) as f:
                     vers = json.load(f)
                     
-                print(vers, curVer)
                 if vers['Version'] != curVer['Version']:
                     req = requests.get(f"https://raw.githubusercontent.com/keivsc/ValorantRPC/v3/matchAssets.zip")
 

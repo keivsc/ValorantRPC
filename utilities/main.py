@@ -77,7 +77,7 @@ __________________
     """)
 
     while True:
-        if not game.are_processes_running(["RiotClientServices.exe"]):
+        if not game.are_processes_running():
             programManager.shutdown()
             os._exit(1)
             

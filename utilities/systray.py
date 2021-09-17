@@ -6,6 +6,7 @@ from .matchStats.stats import Stats
 from plyer import notification
 from .misc.game import Game
 from PIL import Image
+
 kernel32 = ctypes.WinDLL('kernel32')
 user32 = ctypes.WinDLL('user32')
 hWnd = kernel32.GetConsoleWindow()
@@ -51,7 +52,7 @@ class systray:
             self.party = True
             not item.checked
 
-    def matchStats(self):
+    def matchStatsImage(self):
         if self.game.are_processes_running(["RiotClientServices.exe"]) == True:
             if self.config['matchSheet'] == True:
                 notification.notify(
@@ -85,7 +86,7 @@ class systray:
         systray_image = Image.open(self.Config.get_path(os.path.join(self.Config.get_appdata_folder(), 'favicon.ico')))
         systray_menu = menu(
             item('Show window', systray.tray_window_toggle, checked=lambda item: window_shown),
-            item('Create Latest Match Report', self.matchStats),
+            item('Create Latest Match Report (Image)', self.matchStatsImage),
             item('RPC Settings', menu(
                 item(f'Toggle Rank Display', self.updateRank, checked=lambda item: self.showRank),
                 item(f'Toggle Party Display', self.updateParty, checked=lambda item: self.party),
