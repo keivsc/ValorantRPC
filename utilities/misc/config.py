@@ -2,10 +2,16 @@ from plyer.facades import notification
 import requests
 import json
 import os
-import sys
+import sys, time
 from plyer import notification
+from colorama import Fore
 
-latestVersion = "v3"
+def fetchTag():
+    req = requests.get("https://api.github.com/repos/keivsc/valorantrpc/releases/latest")
+    tag = req.json()["tag_name"]
+    return tag
+
+latestVersion = fetchTag()
 currentVersion = "v3.4"
 latestConfig = {}
 translationFile = {}
@@ -27,17 +33,32 @@ class Config:
         return os.path.join(os.path.abspath("."), relative_path)
 
     @staticmethod
+    def checkVersion():
+        try:
+            newConf = Config.fetchConfig()
+            newConf['version'] = currentVersion
+            Config.updateConf(newConf)
+            if float(latestVersion) > float(currentVersion.replace('v', '')):
+                print(f"{Fore.YELLOW}There is a new version of ValorantRPC ({currentVersion} -> v{latestVersion})\n{Fore.GREEN}Download it at\nhttps://github.com/keivsc/ValorantRPC/releases/latest")
+                return True
+        except:
+            print(f"{Fore.RED}Unable to check for new versions")
+            
+
+    @staticmethod
     def checkConfig():
         config = Config().fetchConfig()
         newConf = latestConfig
         newConf['version'] = currentVersion
-        if float(currentVersion.replace('v', '')) < float(latestConfig['version'].replace('v', '')):
+        if Config.checkVersion() == True:
             notification.notify(
                 title='New Version of RPC is available',
                 message='Check out keivsc/ValorantRPC for the new version!',
                 app_icon=Config.get_path(os.path.join(Config.get_appdata_folder(), 'favicon.ico'))
             )
-        if config["configVers"] != latestConfig["configVers"] or config["version"] != latestConfig["version"]:
+        else:
+            print(f"{Fore.GREEN}ValorantRPC Up To Date")
+        if config["configVers"] != latestConfig["configVers"]:
             items = ["configVers", "regions", "languages"]
             for x in items:
                 newConf[x] = latestConfig[x]
@@ -60,7 +81,7 @@ class Config:
                 newConf["startup"]["launch_timeout"] = 60
             
             config = Config().updateConf(newConf)
-            
+        time.sleep(3)
         return config
 
     @staticmethod 
@@ -85,6 +106,7 @@ class Config:
         if not os.path.exists(Config().get_appdata_folder()):
             os.mkdir(Config().get_appdata_folder())
         with open(Config().get_path(os.path.join(Config().get_appdata_folder(), "config.json")), "w") as f:
+            latestConfig["version"] = currentVersion
             json.dump(latestConfig, f, indent=4)
         return Config().fetchConfig()
 
