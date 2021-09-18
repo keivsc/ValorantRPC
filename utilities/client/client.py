@@ -105,6 +105,7 @@ class Client():
             "ShowRank":None,
             "partySize":1,
             "partyMax":0,
+            "partyCount":None,
             "smallImage":None,
             "partyAccess":False,
             "GameData":{
