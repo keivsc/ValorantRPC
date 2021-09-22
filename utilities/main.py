@@ -27,11 +27,11 @@ def main(programManager):
     if config['matchSheet'] == True:
         contentLoader.Loader.createAssets()
     game = Game()
-    thread = threading.Thread(target=systray(programManager).run)
+    thread = threading.Thread(target=systray().run)
     thread.start()
     rpcClient = pypresence.Client(client_id=config["clientID"])
     os.system('cls')
-    game.start_game(programManager)
+    game.start_game()
     valClient = Client()
     valClient.client.activate()
     rpcClient.start()
@@ -78,7 +78,6 @@ __________________
 
     while True:
         if not game.are_processes_running():
-            programManager.shutdown()
             os._exit(1)
             
 

@@ -9,7 +9,7 @@ class ProgramInstanceManager:
     _server_running = False
     _server_closed = False
     
-    def __init__(self, port=35217, ip="127.0.0.1"):
+    def __init__(self, port=9999, ip="127.0.0.1"):
         self.ip, self.port = ip, port
         is_first = self.check_instance()
         if not is_first:
@@ -46,7 +46,7 @@ class ProgramInstanceManager:
 
         while self._server_running:
             try:
-                conn, addr = self.serversock.accept()
+                conn, _ = self.serversock.accept()
                 conn.close()
             except socket.timeout:
                 pass

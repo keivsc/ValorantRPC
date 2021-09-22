@@ -14,7 +14,7 @@ hWnd = kernel32.GetConsoleWindow()
 window_shown = False
 
 class systray:
-    def __init__(self, programManager):
+    def __init__(self):
         self.Config = Config()
         self.config = self.Config.fetchConfig()
         self.systray = None
@@ -22,7 +22,6 @@ class systray:
         self.party = self.config["presence"]["show_party_count"]
         self.game = Game()
         self.stat = Stats(self.config['region'], self.Config)
-        self.instance = programManager
 
     def updateRank(self, icon, item):
         config = self.Config.fetchConfig()
@@ -100,7 +99,6 @@ class systray:
     def exitF(self):
         self.systray.visible = False
         self.systray.stop()
-        self.instance.shutdown()
         os._exit(1)
 
     def generate_icon(self):

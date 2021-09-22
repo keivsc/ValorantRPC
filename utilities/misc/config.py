@@ -17,8 +17,8 @@ latestConfig = {}
 translationFile = {}
 
 def configActivate():
-    globals()['latestConfig'] = (requests.get(f"https://raw.githubusercontent.com/keivsc/ValorantRPC/{latestVersion}/configExample.json")).json()
-    globals()['translationFile'] = (requests.get(f"https://raw.githubusercontent.com/keivsc/ValorantRPC/{latestVersion}/translations.json")).json()
+    globals()['latestConfig'] = (requests.get(f"https://raw.githubusercontent.com/keivsc/ValorantRPC/v3/configExample.json")).json()
+    globals()['translationFile'] = (requests.get(f"https://raw.githubusercontent.com/keivsc/ValorantRPC/v3/translations.json")).json()
 
 
 
