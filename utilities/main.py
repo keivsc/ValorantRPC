@@ -102,7 +102,6 @@ __________________
             try:
                 rpcClient.set_activity(**rpcData)
             except:
-                print(f"{Fore.WHITE}-"*30)
                 print(f"{Fore.RED}Unable to Connect to discord is discord opened?")
                 pass
         else:

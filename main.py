@@ -41,4 +41,4 @@ try:
     main(p)
 except:
     print(f"{Fore.RED}An Exception has occured, save this error ask for help in the support discord")
-    input(Fore.GREEN+traceback.format_exc())
+    input(Fore.YELLOW+traceback.format_exc())
