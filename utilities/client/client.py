@@ -168,9 +168,11 @@ class Client():
             elif state == "INGAME" or state == "PREGAME":
                 data["GameData"]["agent"] = self.Loader.data["agents"][""]["displayName"]
                 data["GameData"]["agentAsset"] = self.Loader.data["agents"][""]["assetName"]
-                subject = self.client.coregame_fetch_player()
-                self.matchMap = self.client.coregame_fetch_match(subject['MatchID'])['MapID']
+                if state == "INGAME" and partyState != "CUSTOM_GAME_SETUP":
+                    subject = self.client.coregame_fetch_player()
+                    self.matchMap = self.client.coregame_fetch_match(subject['MatchID'])['MapID']
                 if state == "PREGAME":
+                    self.matchMap = gamePresence['matchMap']
                     data["inPregame"] = True
                     user = self.client.pregame_fetch_player()
                     if user == None:
@@ -188,8 +190,8 @@ class Client():
                                     data["GameData"]["agent"] = self.Loader.data["agents"][""]["displayName"]
 
                                 if player["Subject"] == user["Subject"]:
-                                    data["GameData"]["agent"] = self.Loader.data["agents"][player["CharacterID"]]["displayName"]
-                                    data["GameData"]["agentAsset"] = self.Loader.data["agents"][player["CharacterID"]]["assetName"]
+                                    data["GameData"]["agent"] = self.Loader.data["agents"][player["CharacterID"].lower()]["displayName"]
+                                    data["GameData"]["agentAsset"] = self.Loader.data["agents"][player["CharacterID"].lower()]["assetName"]
                 else:
                     data["inGame"] = True
                     if self.GameTime == 0:
@@ -206,8 +208,8 @@ class Client():
 
                         for player in Match["Players"]:
                             if player["Subject"] == user["Subject"]:
-                                data["GameData"]["agent"] = self.Loader.data["agents"][player["CharacterID"]]["displayName"]
-                                data["GameData"]["agentAsset"] = self.Loader.data["agents"][player["CharacterID"]]["assetName"]
+                                data["GameData"]["agent"] = self.Loader.data["agents"][player["CharacterID"].lower()]["displayName"]
+                                data["GameData"]["agentAsset"] = self.Loader.data["agents"][player["CharacterID"].lower()]["assetName"]
                 data["GameData"]["map"] = self.Loader.data["maps"][self.matchMap]["displayName"]
                 data["GameData"]["mapAsset"] = self.Loader.data["maps"][self.matchMap]["assetName"]
 
@@ -233,6 +235,7 @@ class Client():
 
         except Exception:
             traceback.print_exc()
+            print(self.Loader.data)
             data['GameData']["mapAsset"] = "game_icon"
             data['GameData']['map'] = "VALORANT"
 
