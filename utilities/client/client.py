@@ -60,6 +60,7 @@ class Client():
         if self.language not in self.config["languages"]:
             self.language = "en-US"
         self.language = self.Config.getTranslation()[self.language]
+        self.matchMap = None
     
 
     def autoDetectRegion(self):
@@ -167,11 +168,9 @@ class Client():
             elif state == "INGAME" or state == "PREGAME":
                 data["GameData"]["agent"] = self.Loader.data["agents"][""]["displayName"]
                 data["GameData"]["agentAsset"] = self.Loader.data["agents"][""]["assetName"]
-                data["GameData"]["map"] = self.Loader.data["maps"][gamePresence["matchMap"]]["displayName"]
-                data["GameData"]["mapAsset"] = self.Loader.data["maps"][gamePresence["matchMap"]]["assetName"]
-
+                subject = self.client.coregame_fetch_player()
+                self.matchMap = self.client.coregame_fetch_match(subject['MatchID'])['MapID']
                 if state == "PREGAME":
-                    
                     data["inPregame"] = True
                     user = self.client.pregame_fetch_player()
                     if user == None:
@@ -192,10 +191,10 @@ class Client():
                                     data["GameData"]["agent"] = self.Loader.data["agents"][player["CharacterID"]]["displayName"]
                                     data["GameData"]["agentAsset"] = self.Loader.data["agents"][player["CharacterID"]]["assetName"]
                 else:
+                    data["inGame"] = True
                     if self.GameTime == 0:
                         self.GameTime = time.time()
                     data["time"] = self.GameTime
-                    data["inGame"] = True
                     data["GameData"]["score"] = f"{gamePresence['partyOwnerMatchScoreAllyTeam']} : {gamePresence['partyOwnerMatchScoreEnemyTeam']}"
                     user = self.client.coregame_fetch_player()
                     if user == None:
@@ -209,7 +208,8 @@ class Client():
                             if player["Subject"] == user["Subject"]:
                                 data["GameData"]["agent"] = self.Loader.data["agents"][player["CharacterID"]]["displayName"]
                                 data["GameData"]["agentAsset"] = self.Loader.data["agents"][player["CharacterID"]]["assetName"]
-
+                data["GameData"]["map"] = self.Loader.data["maps"][self.matchMap]["displayName"]
+                data["GameData"]["mapAsset"] = self.Loader.data["maps"][self.matchMap]["assetName"]
 
 
             elif state == "MENUS" and partyState != "CUSTOM_GAME_SETUP":
@@ -217,6 +217,7 @@ class Client():
                     self.GameTime = 0
                 
                 data["inMenus"] = True
+                self.matchMap = None
 
             if partyState == "CUSTOM_GAME_SETUP":
                 data["inMenus"] = True
@@ -230,7 +231,8 @@ class Client():
             if gamePresence["isIdle"] == True:
                 data["idle"] = True
 
-        except:
+        except Exception:
+            traceback.print_exc()
             data['GameData']["mapAsset"] = "game_icon"
             data['GameData']['map'] = "VALORANT"
 
