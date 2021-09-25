@@ -234,8 +234,6 @@ class Client():
                 data["idle"] = True
 
         except Exception:
-            traceback.print_exc()
-            print(self.Loader.data)
             data['GameData']["mapAsset"] = "game_icon"
             data['GameData']['map'] = "VALORANT"
 
