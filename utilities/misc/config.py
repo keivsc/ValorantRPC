@@ -12,7 +12,7 @@ def fetchTag():
     return tag
 
 latestVersion = fetchTag()
-currentVersion = "v3.4"
+currentVersion = "v3.5"
 latestConfig = {}
 translationFile = {}
 
