@@ -52,7 +52,7 @@ class systray:
             not item.checked
 
     def matchStatsImage(self):
-        if self.game.are_processes_running(["RiotClientServices.exe"]) == True:
+        if self.game.are_processes_running() == True:
             if self.config['matchSheet'] == True:
                 notification.notify(
                     title='Creating Match Report!',
