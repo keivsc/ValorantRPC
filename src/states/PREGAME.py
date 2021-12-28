@@ -21,7 +21,6 @@ class PreGame:
                 break
             self.state = presence['sessionLoopState']
             data = self.client.get_pregame(presence)
-            print(data)
             if data == None:
                 break
             
