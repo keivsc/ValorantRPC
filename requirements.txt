@@ -1,11 +1,8 @@
 pypresence
 valclient
-pystray
+pyside2
 requests
 psutil
 InquirerPy
 iso8601
-pyperclip
-pillow
-plyer
 colorama

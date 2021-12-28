@@ -1,0 +1,33 @@
+{
+    "version":"v4.0",
+    "region":"na",
+    "regions":["na", "eu", "latam", "br", "ap", "kr", "pbe"],
+    "clientID": 876945941628858398,
+    "presence":{
+        "refreshRate": 3,
+        "show_rank": true,
+        "show_party_count":true,
+        "show_level":true,
+        "buttons":{
+            "button1":{
+                "label":"YouTube",
+                "url":"https://www.youtube.com/channel/UCElXNqNdek9HFI3QN496C9Q",
+                "activate":false
+            },
+            "button2":{
+                "label":"Twitch",
+                "url":"https://www.twitch.com/soilive",
+                "activate":false
+            },
+            "button3":{
+                "note":"You can only have 2 buttons so dont try making 3 it won't work"
+            }
+        }
+    },
+    "startup":{
+        "launch_timeout":60
+    },
+    "server":{
+        "port":6969
+    }
+}
