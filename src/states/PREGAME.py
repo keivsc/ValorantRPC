@@ -18,6 +18,7 @@ class PreGame:
         while self.state == "PREGAME":
             presence = self.client.get_presence()
             if presence == None:
+                self.state = None
                 break
             self.state = presence['sessionLoopState']
             data = self.client.get_pregame(presence)
@@ -31,7 +32,8 @@ class PreGame:
             rpc_data['large_text'] = data['map']['displayName']
             rpc_data['small_image'] = data['agent']['assetName']
             rpc_data['small_text'] = data['agent']['displayName']
-            rpc_data['small_text'] += f" | {opt[data['agent']['state']]}"
+            if data['agent']['state'] != '':
+                rpc_data['small_text'] += f" | {opt[data['agent']['state']]}"
             if self.config['presence']['show_party_count']:
                 rpc_data['state'] = f"{presence['partyAccessibility'].capitalize()} Party | {presence['partySize']}/{presence['maxPartySize']}"
 

@@ -44,12 +44,12 @@ class Config:
     def get_appdata_folder():
         return os.path.join(os.getenv('APPDATA'), 'ValorantRPC')
 
-    def fetchConfig(self):
+    def fetch_config(self):
         try:
             with open(os.path.join(Config.get_appdata_folder(), "config.json"), 'r') as f:
-                self.config = json.load(f)
+                return json.load(f)
         except:
-            self.config = Config.create_config()
+            return Config.create_config()
 
     def check(self):
         urllib.request.urlretrieve('https://raw.githubusercontent.com/keivsc/ValorantRPC/v1/favicon.ico',os.path.join(Config.get_appdata_folder(),'favicon.ico'))
@@ -57,12 +57,6 @@ class Config:
         if conf['version'] != current_version:
             os.remove(os.path.join(Config.get_appdata_folder(), "config.json"))
             Config.create_config()
-
-    def fetch_config(self):
-        if self.config == {}:
-            self.fetchConfig()
-            return self.config
-        return self.config
     
     @staticmethod
     def create_config():

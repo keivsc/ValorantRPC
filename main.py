@@ -13,6 +13,7 @@ import psutil
 import time
 import requests
 import sys
+import traceback
 
 psutil.subprocess.Popen([Game.get_rcs_path(), "--launch-product=valorant", "--launch-patchline=live"])
 
@@ -38,7 +39,6 @@ print(f"""{Fore.GREEN}
 """)
 config = Config()
 config.check()
-config.fetchConfig()
 try:
     requests.get(f'http://127.0.0.1:{config.fetch_config()["server"]["port"]}/game').json()
     print(f"{Fore.RED}Another Instance of VALORANTRPC is already on!")
@@ -50,13 +50,7 @@ except Exception:
     pass
 
 game = Game(config)
-def confRefresh():
-    while True:
-        time.sleep(3)
-        config.fetchConfig() 
-
 game.start_game()
-Thread(target=confRefresh, name="Thread | Config Refresh").start()
 Thread(target=sysrun, args=(config,), name="Thread | System Tray").start()
 conf = config.fetch_config()
 rpc = pypresence.Client(client_id=conf['clientID'])
@@ -95,14 +89,18 @@ rpcData["large_text"] = "VALORANT"
 rpcData["small_image"] = "github_icon"
 rpcData["small_text"] = "keivsc/ValorantRPC"
 rpc.set_activity(**rpcData)
+buts = conf['presence']['buttons']
 buttons = None
 for x in range(2):
-    button = conf['presence']['buttons'][f'button{x+1}']
-    if button['activate'] == True:
-        if buttons == None:
-            buttons = []
-        button.pop('activate')
-        buttons.append(button)
+    button = buts[f'button{x+1}']
+    try:
+        if button['activate'] == True:
+            if buttons == None:
+                buttons = []
+            button.pop('activate')
+            buttons.append(button)
+    except:
+        pass
 class RPC:
     @staticmethod
     def set_activity(data):
@@ -115,11 +113,10 @@ while status:
     if status == False:
         os._exit(1)
     presence = valorant.get_presence()
-    state = valorant.get_state(presence)
-    if state == None:
+    if presence == None:
         time.sleep(conf['presence']['refreshRate'])
         continue
-
+    state = presence['sessionLoopState']
     presences = {
         "MENUS":states.MENUS.Menus(valorant, RPC, config),
         "CUSTOM_GAME_SETUP":states.MENUS.Menus(valorant, RPC, config),
@@ -127,4 +124,5 @@ while status:
         "PREGAME":states.PREGAME.PreGame(valorant, RPC, config)
     }
     presences[state].start_presence()
+    time.sleep(conf['presence']['refreshRate'])
 os._exit(1)

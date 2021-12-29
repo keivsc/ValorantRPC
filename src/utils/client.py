@@ -1,6 +1,7 @@
 import valclient
 from .content import Content
 import time
+import traceback
 
 class Client:
     def __init__(self, region):

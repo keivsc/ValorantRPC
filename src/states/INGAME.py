@@ -15,11 +15,11 @@ class InGame:
         while self.state == "INGAME":
             presence = self.client.get_presence()
             if presence == None:
+                self.state = None
                 break
+            self.state = presence['sessionLoopState']
             if self.rank == None:
                 self.rank = self.client.get_rank()
-            self.state = presence['sessionLoopState']
-
             data = self.client.get_coregame(presence)
             if data == None:
                 break
@@ -50,3 +50,4 @@ class InGame:
             self.rpc.set_activity(rpc_data)
             time.sleep(self.config['presence']['refreshRate'])
             self.config = self.Config.fetch_config()
+            

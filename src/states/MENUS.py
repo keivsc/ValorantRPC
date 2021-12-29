@@ -26,12 +26,13 @@ class Menus:
     def start_presence(self):
         while self.state == "MENUS":
             presence = self.client.get_presence()
+            
             if presence == None:
+                self.state = None
                 break
+            self.state = presence['sessionLoopState']
             if self.rank == None:
                 self.rank = self.client.get_rank()
-
-            self.state = presence['sessionLoopState']
             rpc_data = {}
 
             if presence['partyState'] == "MATCHMAKING":
